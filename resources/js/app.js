@@ -3,7 +3,7 @@ import { createApp } from 'vue';
 import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 
-import App from './components/App.vue'; 
+import App from './App.vue'; 
 
 const app = createApp(App);
 
