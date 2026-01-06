@@ -10,33 +10,44 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div v-for="book in books" :key="book.id" class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex gap-4 hover:shadow-md transition-shadow">
-            
-            <img v-if="book.image_url" :src="book.image_url" class="w-20 h-28 object-cover rounded shadow-sm" />
-            <div v-else class="w-20 h-28 bg-gray-200 rounded flex items-center justify-center text-gray-400">
-                <i class="pi pi-image text-2xl"></i>
-            </div>
-
-            <div class="flex flex-col justify-between py-1 w-full">
-                <div>
-                    <h3 class="font-bold text-lg text-gray-800 leading-tight mb-1">{{ book.title }}</h3>
-                    <p class="text-gray-600 text-sm">{{ book.author }}</p>
-                    <p v-if="book.isbn" class="text-gray-400 text-xs mt-1">ISBN: {{ book.isbn }}</p>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div v-for="book in books" :key="book.id" class="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden border border-gray-100">
+            <div class="relative w-full aspect-[2/3] bg-gray-100">
+                <img 
+                    v-if="book.image_url" 
+                    :src="book.image_url" 
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                    alt="Capa do livro"
+                />
+                <div v-else class="w-full h-full flex flex-col items-center justify-center text-gray-400 p-4 text-center">
+                    <i class="pi pi-image text-4xl mb-2"></i>
+                    <span class="text-xs">Sem Capa</span>
                 </div>
-                
-                <div class="mt-2">
-                    <Tag 
+                <div class="absolute top-2 right-2">
+                     <Tag 
                         :value="book.status_formatted.label" 
-                        :severity="book.status_formatted.color" 
-                        :icon="book.status_formatted.icon" 
+                        :severity="book.status_formatted.color"
+                        class="shadow-md !text-[10px] px-2"
                     />
                 </div>
             </div>
+            <div class="p-4 flex flex-col flex-1">
+                <h3 class="font-bold text-gray-800 text-base leading-tight mb-1 line-clamp-2 min-h-[2.5rem]" :title="book.title">
+                    {{ book.title }}
+                </h3>
+                <p class="text-gray-500 text-xs mb-3 truncate">{{ book.author }}</p>
+                <div class="mt-auto pt-3 border-t border-gray-50 flex justify-between items-center">
+                   <span class="text-[10px] text-gray-400 font-mono">
+                       {{ book.isbn ?? 'N/I' }}
+                   </span>
+                   <i :class="[book.status_formatted.icon, 'text-gray-500']"></i>
+                </div>
+            </div>
         </div>
-        
-        <div v-if="books.length === 0" class="col-span-full text-center py-10 text-gray-500">
-            Nenhum livro encontrado. Adicione o primeiro acima!
+        <div v-if="books.length === 0" class="col-span-full flex flex-col items-center justify-center py-16 text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">
+            <i class="pi pi-book text-4xl mb-4"></i>
+            <p class="text-lg">Sua estante está vazia.</p>
+            <p class="text-sm">Use a busca acima para adicionar seu primeiro livro!</p>
         </div>
     </div>
 </template>
