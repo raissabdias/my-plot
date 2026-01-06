@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
-import AutoComplete from 'primevue/autocomplete'; // <--- O Novo Componente
+import AutoComplete from 'primevue/autocomplete';
+import Tag from 'primevue/tag';
 import axios from 'axios';
 
 const books = ref([]);
@@ -47,6 +48,7 @@ const fetchBooks = async () => {
     try {
         const response = await axios.get('/api/books');
         books.value = response.data;
+        console.log("Fetched books:", books.value);
     } catch (error) {
         console.error("Error fetching books:", error);
     }
@@ -129,7 +131,7 @@ onMounted(() => {
                         </div>
                     </div>
                     <div class="mt-2">
-                        <Button label="Confirmar e Salvar" icon="pi pi-check" severity="success" @click="saveBook"
+                        <Button label="Salvar" icon="pi pi-check" severity="success" @click="saveBook"
                             class="w-full" />
                     </div>
                 </div>
@@ -148,10 +150,13 @@ onMounted(() => {
                         <p class="text-gray-600 text-sm">{{ book.author }}</p>
                         <p v-if="book.isbn" class="text-gray-400 text-xs mt-1">ISBN: {{ book.isbn }}</p>
                     </div>
-                    <span
-                        class="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full w-fit">
-                        {{ book.status }}
-                    </span>
+                    <div class="mt-2">
+                        <Tag 
+                            :value="book.status_formatted.label" 
+                            :severity="book.status_formatted.color" 
+                            :icon="book.status_formatted.icon"
+                        />
+                    </div>
                 </div>
             </div>
         </div>

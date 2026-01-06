@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BookStatus;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -30,7 +31,7 @@ class BookController extends Controller
             'title' => $request->title,
             'author' => $request->author,
             'isbn' => $request->isbn,
-            'status' => 'planning_to_read',
+            'status' => BookStatus::PLANNING,
             'image_url' => $request->image_url,
             'user_id' => 1
         ]);
