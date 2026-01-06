@@ -29,6 +29,7 @@ class BookController extends Controller
         $book = Book::create([
             'title' => $request->title,
             'author' => $request->author,
+            'isbn' => $request->isbn,
             'status' => 'planning_to_read',
             'image_url' => $request->image_url,
             'user_id' => 1
@@ -49,7 +50,7 @@ class BookController extends Controller
 
         $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
             'q' => $query,
-            'maxResults' => 1 # TODO: list more results
+            'maxResults' => 10
         ]);
 
         $data = $response->json();
@@ -57,16 +58,20 @@ class BookController extends Controller
             return response()->json(['error' => 'Book not found'], 404);
         }
 
-        $bookData = $data['items'][0]['volumeInfo'];
+        $results = collect($data['items'])->map(function ($item) {
+            $info = $item['volumeInfo'];
+            $isbn = $info['industryIdentifiers'][0]['identifier'] ?? null;
 
-        return response()->json([
-            'title' => $bookData['title'] ?? '',
-            'author' => $bookData['authors'][0] ?? 'Unknown Author',
-            'isbn' => $bookData['industryIdentifiers'][0]['identifier'] ?? null,
-            'image_url' => isset($bookData['imageLinks']['thumbnail']) 
-                ? str_replace('http://', 'https://', $bookData['imageLinks']['thumbnail']) 
-                : null,
-            'description' => $bookData['description'] ?? '',
-        ]);
+            return [
+                'title' => $info['title'] ?? 'Sem Título',
+                'author' => $info['authors'][0] ?? 'Desconhecido',
+                'isbn' => $isbn,
+                'image_url' => isset($info['imageLinks']['thumbnail']) 
+                    ? str_replace('http://', 'https://', $info['imageLinks']['thumbnail']) 
+                    : null,
+            ];
+        });
+
+        return response()->json($results);
     }
 }
