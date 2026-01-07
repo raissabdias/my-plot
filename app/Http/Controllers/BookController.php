@@ -27,7 +27,8 @@ class BookController extends Controller
             'title' => $request->title,
             'author' => $request->author,
             'isbn' => $request->isbn,
-            'status' => BookStatus::PLANNING,
+            'status' => $request->status,
+            'rating' => $request->rating,
             'image_url' => $request->image_url,
             'user_id' => 1
         ]);
@@ -65,5 +66,15 @@ class BookController extends Controller
         ]);
 
         return response()->json($book);
+    }
+
+    /**
+     * Delete a book (DELETE /api/books/{book})
+     */
+    public function destroy(Book $book)
+    {
+        $book->delete();
+
+        return response()->noContent();
     }
 }

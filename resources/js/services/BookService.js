@@ -36,4 +36,12 @@ export default {
     update(id, bookData) {
         return axios.put(`${API_URL}/${id}`, bookData);
     },
+
+    /**
+     * Remove um livro da estante
+     * @param {Number} id - O ID do livro a ser apagado
+     */
+    delete(id) {
+        return axios.delete(`${API_URL}/${id}`);
+    },
 };

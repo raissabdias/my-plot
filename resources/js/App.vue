@@ -7,6 +7,8 @@ import BookForm from './components/Books/BookForm.vue';
 import BookList from './components/Books/BookList.vue';
 
 import Dialog from 'primevue/dialog';
+import ConfirmDialog from 'primevue/confirmdialog';
+import { useConfirm } from "primevue/useconfirm";
 
 const books = ref([]);
 const isModalVisible = ref(false);
@@ -19,6 +21,11 @@ const fetchBooks = async () => {
     } catch (error) {
         console.error("Error fetching books:", error);
     }
+};
+
+const openCreateModal = () => {
+    selectedBook.value = null;
+    isModalVisible.value = true;
 };
 
 const openEditModal = (book) => {
@@ -35,13 +42,41 @@ const onBookSaved = () => {
 onMounted(() => {
     fetchBooks();
 });
+
+const confirm = useConfirm();
+
+const confirmDelete = (book) => {
+    confirm.require({
+        message: `Tem certeza que deseja excluir "${book.title}"?`,
+        header: 'Confirmação de Exclusão',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Cancelar',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Excluir',
+            severity: 'danger'
+        },
+        accept: async () => {
+            
+            try {
+                await BookService.delete(book.id);
+                fetchBooks();
+            } catch (error) {
+                console.error("Erro ao excluir", error);
+            }
+        },
+    });
+};
 </script>
 
 <template>
   <div class="min-h-screen bg-slate-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
     <TheNavbar @open-modal="openCreateModal" />
     <main class="max-w-7xl mx-auto p-6">
-        <BookList :books="books" @edit="openEditModal" />
+        <BookList :books="books" @edit="openEditModal" @delete="confirmDelete" />
     </main>
     <Dialog 
         v-model:visible="isModalVisible" 
@@ -55,11 +90,12 @@ onMounted(() => {
         <div class="pt-2">
             <BookForm 
                 :bookToEdit="selectedBook" 
-                @created="onBookSaved" 
-                @updated="onBookSaved"
+                @created="onBookSaved"  
+                @updated="onBookSaved" 
                 class="!shadow-none !border-0 !p-0" 
             />
         </div>
     </Dialog>
+    <ConfirmDialog class="max-w-md" />
   </div>
 </template>

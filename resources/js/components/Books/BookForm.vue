@@ -20,8 +20,8 @@ const title = ref('');
 const author = ref('');
 const isbn = ref('');
 const imageUrl = ref('');
-const status = ref(null); // Novo: Status
-const rating = ref(0);    // Novo: Nota (0 a 5)
+const status = ref(null);
+const rating = ref(0);
 
 const selectedBookSearch = ref(null);
 const suggestions = ref([]);

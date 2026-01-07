@@ -2,6 +2,7 @@ import './bootstrap';
 import { createApp } from 'vue';
 import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
+import ConfirmationService from 'primevue/confirmationservice';
 
 import App from './App.vue'; 
 
@@ -19,4 +20,5 @@ app.use(PrimeVue, {
         }
     }
 });
+app.use(ConfirmationService);
 app.mount('#app');

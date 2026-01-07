@@ -1,7 +1,8 @@
 <script setup>
 import Tag from 'primevue/tag';
+import Button from 'primevue/button';
 
-const emit = defineEmits(['edit']);
+const emit = defineEmits(['edit', 'delete', 'updated']);
 
 const props = defineProps({
     books: {
@@ -38,11 +39,22 @@ const props = defineProps({
                     {{ book.title }}
                 </h3>
                 <p class="text-gray-500 text-xs mb-3 truncate">{{ book.author }}</p>
-                <div class="mt-auto pt-3 border-t border-gray-50 flex justify-between items-center">
-                   <span class="text-[10px] text-gray-400 font-mono">
-                       {{ book.isbn ?? 'N/I' }}
-                   </span>
-                   <i :class="[book.status_formatted.icon, 'text-gray-500']"></i>
+                <div class="mt-auto pt-3 border-t border-gray-50 flex justify-between items-center dark:border-gray-700">
+                    <span class="text-[10px] text-gray-400 font-mono">
+                        {{ book.isbn ?? 'N/I' }}
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <i :class="[book.status_formatted.icon, 'text-' + book.status_formatted.tailwind_color + '-500']"></i>
+                        <Button 
+                            icon="pi pi-trash" 
+                            text 
+                            rounded 
+                            severity="danger" 
+                            size="small"
+                            class="!w-8 !h-8"
+                            @click.stop="$emit('delete', book)"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
