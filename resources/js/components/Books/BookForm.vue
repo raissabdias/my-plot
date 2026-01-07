@@ -1,81 +1,125 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch, computed } from 'vue';
+import BookService from '../../services/BookService';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import AutoComplete from 'primevue/autocomplete';
-import BookService from '../../services/BookService';
+import Rating from 'primevue/rating';
+import Dropdown from 'primevue/dropdown';
 
-const emit = defineEmits(['created']);
+const props = defineProps({
+    bookToEdit: {
+        type: Object,
+        default: null
+    }
+});
 
-// Estado local do formulário
+const emit = defineEmits(['created', 'updated']);
+
 const title = ref('');
 const author = ref('');
 const isbn = ref('');
 const imageUrl = ref('');
+const status = ref(null); // Novo: Status
+const rating = ref(0);    // Novo: Nota (0 a 5)
+
 const selectedBookSearch = ref(null);
 const suggestions = ref([]);
 
-// Buscar livros do Google Books API enquanto o usuário digita
-const searchBookParams = async (event) => {
-    const query = event.query;
+const statusOptions = [
+    { label: 'Quero Ler', value: 'planning_to_read' },
+    { label: 'Lendo', value: 'reading' },
+    { label: 'Lido', value: 'read' }
+];
 
+const resetForm = () => {
+    title.value = '';
+    author.value = '';
+    isbn.value = '';
+    imageUrl.value = '';
+    status.value = 'planning_to_read';
+    rating.value = 0;
+    selectedBookSearch.value = null;
+};
+
+watch(() => props.bookToEdit, (newBook) => {
+    if (newBook) {
+        title.value = newBook.title;
+        author.value = newBook.author;
+        isbn.value = newBook.isbn;
+        imageUrl.value = newBook.image_url;
+        status.value = newBook.status; 
+        rating.value = newBook.rating || 0;
+    } else {
+        resetForm();
+    }
+}, { immediate: true });
+
+
+const searchBookParams = async (event) => {
     try {
         const response = await BookService.searchGoogle(event.query);
         suggestions.value = response.data;
     } catch (error) {
-        console.error(error);
         suggestions.value = [];
     }
 };
 
-// Selecionar um livro da lista de sugestões
 const onBookSelect = (event) => {
     const book = event.value;
-
     title.value = book.title;
     author.value = book.author;
     isbn.value = book.isbn;
     imageUrl.value = book.image_url;
-
     selectedBookSearch.value = null;
 };
 
-// Salvar um novo livro
 const saveBook = async () => {
     if (!title.value) return;
 
+    const payload = {
+        title: title.value,
+        author: author.value,
+        isbn: isbn.value,
+        image_url: imageUrl.value,
+        status: status.value,
+        rating: rating.value
+    };
+
     try {
-        await BookService.create({
-            title: title.value,
-            author: author.value,
-            isbn: isbn.value,
-            image_url: imageUrl.value
-        });
-
-        title.value = '';
-        author.value = '';
-        isbn.value = '';
-        imageUrl.value = '';
-
-        emit('created');
+        if (props.bookToEdit) {
+            await BookService.update(props.bookToEdit.id, payload);
+            emit('updated');
+        } else {
+            await BookService.create(payload);
+            emit('created');
+        }
+        resetForm();
     } catch (error) {
         console.error("Erro ao salvar:", error);
     }
 };
+
+const buttonLabel = computed(() => props.bookToEdit ? 'Atualizar Livro' : 'Adicionar Livro');
 </script>
 
 <template>
-    <div>
-        <h2 class="text-xl font-semibold text-gray-700 dark:text-white mb-4">Adicionar Novo Livro</h2>
-        <div class="flex flex-col gap-2 mb-6">
-            <label class="text-sm text-gray-500">Busque no Google Books:</label>
-            <AutoComplete v-model="selectedBookSearch" :suggestions="suggestions" @complete="searchBookParams"
-                @item-select="onBookSelect" optionLabel="title" placeholder="Digite o nome do livro..." class="w-full"
-                inputClass="w-full">
+    <div class="flex flex-col gap-6 dark:bg-gray-900">
+        <div v-if="!bookToEdit" class="flex flex-col gap-2">
+            <label class="text-sm text-gray-500 dark:text-gray-400">Preenchimento automático via Google:</label>
+            <AutoComplete 
+                v-model="selectedBookSearch" 
+                :suggestions="suggestions" 
+                @complete="searchBookParams" 
+                @item-select="onBookSelect"
+                optionLabel="title"
+                placeholder="Busque o livro..." 
+                class="w-full"
+                inputClass="w-full"
+            >
                 <template #option="slotProps">
                     <div class="flex items-center gap-2">
-                        <img v-if="slotProps.option.image_url" :src="slotProps.option.image_url"
-                            class="w-8 h-12 object-cover" />
+                        <img v-if="slotProps.option.image_url" :src="slotProps.option.image_url" class="w-8 h-12 object-cover" />
                         <div class="flex flex-col">
                             <span class="font-bold">{{ slotProps.option.title }}</span>
                             <span class="text-xs text-gray-500">{{ slotProps.option.author }}</span>
@@ -83,35 +127,53 @@ const saveBook = async () => {
                     </div>
                 </template>
             </AutoComplete>
+            <div class="border-b border-gray-200 dark:border-gray-700 my-2"></div>
         </div>
-        <hr class="mb-6 border-gray-200" />
-        <div class="flex gap-6">
-            <div class="w-32 flex-shrink-0 flex flex-col gap-2">
-                <div v-if="imageUrl" class="relative">
-                    <img :src="imageUrl" alt="Capa" class="w-full rounded dark:bg-gray-600 shadow-md" />
+        <div class="flex gap-6 flex-col md:flex-row">
+            <div class="w-full md:w-32 flex-shrink-0 flex flex-col gap-2 items-center">
+                <div v-if="imageUrl" class="relative w-32 aspect-[2/3]">
+                    <img :src="imageUrl" alt="Capa" class="w-full h-full object-cover rounded shadow-md" />
                 </div>
-                <div v-else
-                    class="w-full h-44 bg-gray-100 dark:bg-gray-600 rounded flex items-center justify-center text-gray-400 text-xs text-center p-2">
+                <div v-else class="w-32 aspect-[2/3] bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-gray-400 text-xs text-center p-2">
                     Sem Capa
                 </div>
             </div>
-            <div class="flex-1 flex flex-col gap-4">
+            <div class="flex-1 flex flex-col gap-4 w-full">
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Título</label>
                     <InputText v-model="title" class="w-full" />
                 </div>
-                <div class="flex gap-4">
-                    <div class="flex-1 flex flex-col gap-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2">
                         <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Autor</label>
                         <InputText v-model="author" class="w-full" />
                     </div>
-                    <div class="w-1/3 flex flex-col gap-2">
+                    <div class="flex flex-col gap-2">
                         <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">ISBN</label>
-                        <InputText v-model="isbn" class="w-full bg-gray-50 dark:bg-gray-800 dark:text-gray-300" readonly />
+                        <InputText v-model="isbn" class="w-full bg-gray-50 dark:bg-gray-800 dark:text-gray-400" />
                     </div>
                 </div>
-                <div class="text-center mt-2">
-                    <Button label="Salvar" icon="pi pi-check" severity="success" @click="saveBook" />
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Status de Leitura</label>
+                        <Dropdown 
+                            v-model="status" 
+                            :options="statusOptions" 
+                            optionLabel="label" 
+                            optionValue="value"
+                            placeholder="Selecione..." 
+                            class="w-full"
+                        />
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Sua Avaliação</label>
+                        <div class="h-[42px] flex items-center">
+                            <Rating v-model="rating" :cancel="false" />
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <Button :label="buttonLabel" icon="pi pi-check" severity="success" @click="saveBook" />
                 </div>
             </div>
         </div>

@@ -26,5 +26,14 @@ export default {
         return axios.get(`${API_URL}/search`, {
             params: { q: query }
         });
-    }
+    },
+
+    /**
+     * Atualiza um livro existente
+     * @param {Number} id - ID do livro
+     * @param {Object} bookData - Dados atualizados
+     */
+    update(id, bookData) {
+        return axios.put(`${API_URL}/${id}`, bookData);
+    },
 };

@@ -49,4 +49,21 @@ class BookController extends Controller
 
         return response()->json($results);
     }
+
+    /**
+     * Update an existing book (PUT /api/books/{book})
+     */
+    public function update(StoreBookRequest $request, Book $book)
+    {
+        $book->update([
+            'title' => $request->title,
+            'author' => $request->author,
+            'isbn' => $request->isbn,
+            'image_url' => $request->image_url,
+            'status' => $request->status,
+            'rating' => $request->rating,
+        ]);
+
+        return response()->json($book);
+    }
 }

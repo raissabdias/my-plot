@@ -10,8 +10,8 @@ import Dialog from 'primevue/dialog';
 
 const books = ref([]);
 const isModalVisible = ref(false);
+const selectedBook = ref(null);
 
-// Busca os livros
 const fetchBooks = async () => {
     try {
         const response = await BookService.getAll();
@@ -21,10 +21,15 @@ const fetchBooks = async () => {
     }
 };
 
-// Quando um livro é criado com sucesso
-const onBookCreated = () => {
+const openEditModal = (book) => {
+    selectedBook.value = book;
+    isModalVisible.value = true;
+};
+
+const onBookSaved = () => {
     isModalVisible.value = false;
-    fetchBooks(); 
+    selectedBook.value = null;
+    fetchBooks();
 };
 
 onMounted(() => {
@@ -34,29 +39,26 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen bg-slate-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
-    <TheNavbar @open-modal="isModalVisible = true" />
+    <TheNavbar @open-modal="openCreateModal" />
     <main class="max-w-7xl mx-auto p-6">
-        <div class="flex items-end justify-between mb-8">
-            <div>
-                <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100">My Plot</h2>
-                <p class="text-gray-500 mt-1">Gerencie suas leituras e descubra novas histórias.</p>
-            </div>
-            <div class="text-sm font-medium text-gray-500 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">
-                Total: <span class="text-indigo-600 dark:text-indigo-400 font-bold">{{ books.length }}</span> livros
-            </div>
-        </div>
-        <BookList :books="books" />
+        <BookList :books="books" @edit="openEditModal" />
     </main>
     <Dialog 
         v-model:visible="isModalVisible" 
         modal 
-        header="Adicionar Novo Livro" 
+        :header="selectedBook ? 'Editar Livro' : 'Adicionar Novo Livro'" 
         :style="{ width: '50rem' }" 
         :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
         dismissableMask
+        class="dark:bg-gray-900"
     >
         <div class="pt-2">
-            <BookForm @created="onBookCreated" class="" />
+            <BookForm 
+                :bookToEdit="selectedBook" 
+                @created="onBookSaved" 
+                @updated="onBookSaved"
+                class="!shadow-none !border-0 !p-0" 
+            />
         </div>
     </Dialog>
   </div>
