@@ -1,16 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
 
 import BookForm from './components/Books/BookForm.vue';
 import BookList from './components/Books/BookList.vue';
+import BookService from './services/BookService';
 
 const books = ref([]);
 
 // Lista de livros salvos
 const fetchBooks = async () => {
   try {
-    const response = await axios.get('/api/books');
+    const response = await BookService.getAll();
     books.value = response.data;
   } catch (error) {
     console.error("Error fetching books:", error);

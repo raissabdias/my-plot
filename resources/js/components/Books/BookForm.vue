@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue';
-import axios from 'axios';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import AutoComplete from 'primevue/autocomplete';
+import BookService from '../../services/BookService';
 
 const emit = defineEmits(['created']);
 
@@ -20,9 +20,7 @@ const searchBookParams = async (event) => {
     const query = event.query;
 
     try {
-        const response = await axios.get('/api/books/search', {
-            params: { q: query }
-        });
+        const response = await BookService.searchGoogle(event.query);
         suggestions.value = response.data;
     } catch (error) {
         console.error(error);
@@ -47,7 +45,7 @@ const saveBook = async () => {
     if (!title.value) return;
 
     try {
-        await axios.post('/api/books', {
+        await BookService.create({
             title: title.value,
             author: author.value,
             isbn: isbn.value,
@@ -69,7 +67,6 @@ const saveBook = async () => {
 <template>
     <div class="bg-white p-6 rounded-xl shadow-lg mb-8 border border-gray-100">
         <h2 class="text-xl font-semibold text-gray-700 mb-4">Adicionar Novo Livro</h2>
-
         <div class="flex flex-col gap-2 mb-6">
             <label class="text-sm text-gray-500">Busque no Google Books:</label>
             <AutoComplete v-model="selectedBookSearch" :suggestions="suggestions" @complete="searchBookParams"
