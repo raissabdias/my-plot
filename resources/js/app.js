@@ -5,12 +5,18 @@ import Aura from '@primevue/themes/aura';
 
 import App from './App.vue'; 
 
-const app = createApp(App);
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.classList.add('dark');
+}
 
+const app = createApp(App);
 app.use(PrimeVue, {
     theme: {
-        preset: Aura
+        preset: Aura,
+        options: {
+            // Isso diz ao PrimeVue: "Ative o modo escuro quando a tag HTML tiver a classe 'dark'"
+            darkModeSelector: '.dark',
+        }
     }
 });
-
 app.mount('#app');

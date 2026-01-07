@@ -33,16 +33,16 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50">
+  <div class="min-h-screen bg-slate-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
     <TheNavbar @open-modal="isModalVisible = true" />
     <main class="max-w-7xl mx-auto p-6">
         <div class="flex items-end justify-between mb-8">
             <div>
-                <h2 class="text-3xl font-bold text-gray-800">My Plot</h2>
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100">My Plot</h2>
                 <p class="text-gray-500 mt-1">Gerencie suas leituras e descubra novas histórias.</p>
             </div>
-            <div class="text-sm font-medium text-gray-500 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
-                Total: <span class="text-indigo-600 font-bold">{{ books.length }}</span> livros
+            <div class="text-sm font-medium text-gray-500 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">
+                Total: <span class="text-indigo-600 dark:text-indigo-400 font-bold">{{ books.length }}</span> livros
             </div>
         </div>
         <BookList :books="books" />

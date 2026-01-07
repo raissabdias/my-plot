@@ -65,8 +65,8 @@ const saveBook = async () => {
 </script>
 
 <template>
-    <div class="bg-white">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Adicionar Novo Livro</h2>
+    <div>
+        <h2 class="text-xl font-semibold text-gray-700 dark:text-white mb-4">Adicionar Novo Livro</h2>
         <div class="flex flex-col gap-2 mb-6">
             <label class="text-sm text-gray-500">Busque no Google Books:</label>
             <AutoComplete v-model="selectedBookSearch" :suggestions="suggestions" @complete="searchBookParams"
@@ -88,26 +88,26 @@ const saveBook = async () => {
         <div class="flex gap-6">
             <div class="w-32 flex-shrink-0 flex flex-col gap-2">
                 <div v-if="imageUrl" class="relative">
-                    <img :src="imageUrl" alt="Capa" class="w-full rounded shadow-md" />
+                    <img :src="imageUrl" alt="Capa" class="w-full rounded dark:bg-gray-600 shadow-md" />
                 </div>
                 <div v-else
-                    class="w-full h-44 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs text-center p-2">
+                    class="w-full h-44 bg-gray-100 dark:bg-gray-600 rounded flex items-center justify-center text-gray-400 text-xs text-center p-2">
                     Sem Capa
                 </div>
             </div>
             <div class="flex-1 flex flex-col gap-4">
                 <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-gray-600 text-sm">Título</label>
+                    <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Título</label>
                     <InputText v-model="title" class="w-full" />
                 </div>
                 <div class="flex gap-4">
                     <div class="flex-1 flex flex-col gap-2">
-                        <label class="font-semibold text-gray-600 text-sm">Autor</label>
+                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Autor</label>
                         <InputText v-model="author" class="w-full" />
                     </div>
                     <div class="w-1/3 flex flex-col gap-2">
-                        <label class="font-semibold text-gray-600 text-sm">ISBN</label>
-                        <InputText v-model="isbn" class="w-full bg-gray-50" readonly />
+                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">ISBN</label>
+                        <InputText v-model="isbn" class="w-full bg-gray-50 dark:bg-gray-800 dark:text-gray-300" readonly />
                     </div>
                 </div>
                 <div class="text-center mt-2">
