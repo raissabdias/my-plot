@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\BookStatus;
 use App\Models\Book;
+use App\Services\GoogleBooksService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 
 class BookController extends Controller
 {
@@ -42,36 +42,14 @@ class BookController extends Controller
     /**
      * Search for a book using Google Books API (GET /api/books/search?q=...)
      */
-    public function search(Request $request)
+    public function search(Request $request, GoogleBooksService $googleBooksService)
     {
         $query = $request->query('q');
         if (!$query) {
             return response()->json(['error' => 'Query param is required'], 400);
         }
 
-        $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
-            'q' => $query,
-            'maxResults' => 10
-        ]);
-
-        $data = $response->json();
-        if (empty($data['items'])) {
-            return response()->json(['error' => 'Book not found'], 404);
-        }
-
-        $results = collect($data['items'])->map(function ($item) {
-            $info = $item['volumeInfo'];
-            $isbn = $info['industryIdentifiers'][0]['identifier'] ?? null;
-
-            return [
-                'title' => $info['title'] ?? 'Sem Título',
-                'author' => $info['authors'][0] ?? 'Desconhecido',
-                'isbn' => $isbn,
-                'image_url' => isset($info['imageLinks']['thumbnail']) 
-                    ? str_replace('http://', 'https://', $info['imageLinks']['thumbnail']) 
-                    : null,
-            ];
-        });
+        $results = $googleBooksService->search($query);
 
         return response()->json($results);
     }
