@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\BookStatus;
+use App\Http\Requests\StoreBookRequest;
 use App\Models\Book;
 use App\Services\GoogleBooksService;
 use Illuminate\Http\Request;
@@ -20,13 +21,8 @@ class BookController extends Controller
     /**
      * Store a new book (POST /api/books)
      */
-    public function store(Request $request)
+    public function store(StoreBookRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'nullable|string|max:255',
-        ]);
-
         $book = Book::create([
             'title' => $request->title,
             'author' => $request->author,
