@@ -65,7 +65,7 @@ const saveBook = async () => {
 </script>
 
 <template>
-    <div class="bg-white p-6 rounded-xl shadow-lg mb-8 border border-gray-100">
+    <div class="bg-white">
         <h2 class="text-xl font-semibold text-gray-700 mb-4">Adicionar Novo Livro</h2>
         <div class="flex flex-col gap-2 mb-6">
             <label class="text-sm text-gray-500">Busque no Google Books:</label>
@@ -110,9 +110,8 @@ const saveBook = async () => {
                         <InputText v-model="isbn" class="w-full bg-gray-50" readonly />
                     </div>
                 </div>
-                <div class="mt-2">
-                    <Button label="Salvar" icon="pi pi-check" severity="success" @click="saveBook"
-                        class="w-full" />
+                <div class="text-center mt-2">
+                    <Button label="Salvar" icon="pi pi-check" severity="success" @click="saveBook" />
                 </div>
             </div>
         </div>
