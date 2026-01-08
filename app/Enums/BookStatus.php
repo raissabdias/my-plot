@@ -26,9 +26,9 @@ enum BookStatus: string
     public function color(): string
     {
         return match($this) {
-            self::READING => 'info',
-            self::READ => 'success',
-            self::PLANNING => 'secondary',
+            self::READING => 'blue',
+            self::READ => 'green',
+            self::PLANNING => 'gray',
         };
     }
 
