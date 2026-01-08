@@ -98,4 +98,11 @@ const confirmDelete = (book) => {
     </Dialog>
     <ConfirmDialog class="max-w-md" />
   </div>
+    <button 
+        @click="openCreateModal"
+        class="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center text-2xl z-50 md:hidden transition-transform active:scale-90"
+        aria-label="Adicionar Livro"
+    >
+        <i class="pi pi-plus"></i>
+    </button>
 </template>

@@ -15,13 +15,16 @@ defineEmits(['open-modal']);
             </h1>
         </div>
         <div>
-            <Button 
-                label="Novo Livro" 
-                icon="pi pi-plus" 
-                severity="secondary" 
-                raised
-                @click="$emit('open-modal')" 
-            />
+            <div class="hidden md:block">
+                <Button 
+                    label="Novo Livro" 
+                    icon="pi pi-plus" 
+                    severity="primary" 
+                    raised
+                    @click="$emit('open-modal')" 
+                    class="hidden md:flex"
+                />
+            </div>
         </div>
     </nav>
 </template>

@@ -13,7 +13,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
         <div v-for="book in books" :key="book.id" @click="$emit('edit', book)" class="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
             <div class="relative w-full aspect-[2/3] bg-gray-100 dark:bg-gray-700">
                 <img 
