@@ -30,6 +30,7 @@ class BookController extends Controller
             'status' => $request->status,
             'rating' => $request->rating,
             'image_url' => $request->image_url,
+            'review' => $request->review,
             'user_id' => 1
         ]);
 
@@ -63,6 +64,7 @@ class BookController extends Controller
             'image_url' => $request->image_url,
             'status' => $request->status,
             'rating' => $request->rating,
+            'review' => $request->review,
         ]);
 
         return response()->json($book);

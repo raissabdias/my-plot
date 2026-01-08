@@ -25,6 +25,7 @@ class StoreBookRequest extends FormRequest
             'author' => 'nullable|string|max:255',
             'isbn' => 'nullable|string', 
             'image_url' => 'nullable|url', 
+            'review' => 'nullable|string', 
         ];
     }
 }

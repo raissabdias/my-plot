@@ -6,6 +6,7 @@ import Button from 'primevue/button';
 import AutoComplete from 'primevue/autocomplete';
 import Rating from 'primevue/rating';
 import Dropdown from 'primevue/dropdown';
+import Textarea from 'primevue/textarea';
 
 const props = defineProps({
     bookToEdit: {
@@ -22,6 +23,7 @@ const isbn = ref('');
 const imageUrl = ref('');
 const status = ref(null);
 const rating = ref(0);
+const review = ref('');
 
 const selectedBookSearch = ref(null);
 const suggestions = ref([]);
@@ -39,6 +41,7 @@ const resetForm = () => {
     imageUrl.value = '';
     status.value = 'planning_to_read';
     rating.value = 0;
+    review.value = '';
     selectedBookSearch.value = null;
 };
 
@@ -50,6 +53,7 @@ watch(() => props.bookToEdit, (newBook) => {
         imageUrl.value = newBook.image_url;
         status.value = newBook.status; 
         rating.value = newBook.rating || 0;
+        review.value = newBook.review; 
     } else {
         resetForm();
     }
@@ -83,7 +87,8 @@ const saveBook = async () => {
         isbn: isbn.value,
         image_url: imageUrl.value,
         status: status.value,
-        rating: rating.value
+        rating: rating.value,
+        review: review.value
     };
 
     try {
@@ -171,6 +176,10 @@ const buttonLabel = computed(() => props.bookToEdit ? 'Atualizar Livro' : 'Adici
                             <Rating v-model="rating" :cancel="false" />
                         </div>
                     </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Resenha/Comentário</label>
+                    <Textarea v-model="review" class="w-full bg-gray-50 dark:bg-gray-800 dark:text-gray-400" rows="2" cols="30" />
                 </div>
                 <div class="mt-4 text-center">
                     <Button :label="buttonLabel" icon="pi pi-check" severity="success" @click="saveBook" />
