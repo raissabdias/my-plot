@@ -1,29 +1,26 @@
 <script setup>
 import Button from 'primevue/button';
+import logoDark from '../assets/logo_black.png';
+import logoLight from '../assets/logo_white.png';
 
 defineEmits(['open-modal']);
 </script>
 
 <template>
-    <nav class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm dark:bg-gray-800 dark:border-gray-700 transition-colors duration-300">
-        <div class="flex items-center gap-3">
-            <div class="bg-indigo-600 text-white p-2 rounded-lg">
-                <i class="pi pi-book text-xl"></i>
-            </div>
-            <h1 class="text-xl font-bold text-gray-800 tracking-tight dark:text-white">
-                MyPlot
-            </h1>
-        </div>
-        <div>
-            <div class="hidden md:block">
-                <Button 
-                    label="Novo Livro" 
-                    icon="pi pi-plus" 
-                    severity="primary" 
-                    raised
-                    @click="$emit('open-modal')" 
-                    class="hidden md:flex"
-                />
+    <nav
+        class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <img :src="logoDark" alt="My Plot Logo" class="h-14 w-auto block dark:hidden" />
+                    <img :src="logoLight" alt="My Plot Logo" class="h-14 w-auto hidden dark:block" />
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:block">
+                        <Button label="Novo Livro" icon="pi pi-plus" severity="primary" raised
+                            @click="$emit('open-modal')" />
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
