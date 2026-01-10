@@ -13,9 +13,9 @@ class BookController extends Controller
     /**
      * List all books (GET /api/books)
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Book::orderBy('created_at', 'desc')->get();
+        return $request->user()->books()->latest()->get();
     }
 
     /**
@@ -23,15 +23,14 @@ class BookController extends Controller
      */
     public function store(StoreBookRequest $request)
     {
-        $book = Book::create([
+        $book = $request->user()->books()->create([
             'title' => $request->title,
             'author' => $request->author,
             'isbn' => $request->isbn,
             'status' => $request->status,
             'rating' => $request->rating,
             'image_url' => $request->image_url,
-            'review' => $request->review,
-            'user_id' => 1
+            'review' => $request->review
         ]);
 
         return response()->json($book, 201);
@@ -42,7 +41,7 @@ class BookController extends Controller
      */
     public function search(Request $request, GoogleBooksService $googleBooksService)
     {
-        $query = $request->query('q');
+        $query = $request->query('query');
         if (!$query) {
             return response()->json(['error' => 'Query param is required'], 400);
         }
@@ -55,8 +54,9 @@ class BookController extends Controller
     /**
      * Update an existing book (PUT /api/books/{book})
      */
-    public function update(StoreBookRequest $request, Book $book)
+    public function update(StoreBookRequest $request, string $id)
     {
+        $book = $request->user()->books()->findOrFail($id);
         $book->update([
             'title' => $request->title,
             'author' => $request->author,
@@ -73,8 +73,9 @@ class BookController extends Controller
     /**
      * Delete a book (DELETE /api/books/{book})
      */
-    public function destroy(Book $book)
+    public function destroy(Request $request, string $id)
     {
+        $book = $request->user()->books()->findOrFail($id);
         $book->delete();
 
         return response()->noContent();
