@@ -44,4 +44,32 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Deslogado com sucesso']);
     }
+
+    /**
+     * Register a new user
+     */
+    public function register(Request $request)
+    {
+        $fields = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'unique:users'],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+        ]);
+
+        $user = \App\Models\User::create([
+            'name' => $fields['name'],
+            'email' => $fields['email'],
+            'password' => bcrypt($fields['password']),
+        ]);
+
+        # Autenticar o usuário recém-registrado
+        /** @var \App\Models\User $user */
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'user' => $user,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ], 201);
+    }
 }

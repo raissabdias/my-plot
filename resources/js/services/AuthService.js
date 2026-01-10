@@ -36,5 +36,21 @@ export default {
     isAuthenticated() {
         const token = localStorage.getItem('user_token');
         return !!token; 
+    },
+
+    /**
+     * Cadastrar um novo usuário
+     * @param {object} user 
+     * @returns 
+     */
+    async register(user) {
+        const response = await http.post('/register', user);
+
+        if (response.data.access_token) {
+            localStorage.setItem('user_token', response.data.access_token);
+            localStorage.setItem('user_data', JSON.stringify(response.data.user));
+        }
+
+        return response.data;
     }
 };

@@ -7,6 +7,7 @@ import TheNavbar from './components/TheNavbar.vue';
 import BookForm from './components/Books/BookForm.vue';
 import BookList from './components/Books/BookList.vue';
 import Login from './components/Login.vue';
+import Register from './components/Register.vue';
 
 import Dialog from 'primevue/dialog';
 import ConfirmDialog from 'primevue/confirmdialog';
@@ -77,15 +78,22 @@ const isLoggedIn = ref(AuthService.isAuthenticated());
 
 const onLoginSuccess = () => {
     isLoggedIn.value = true;
+    showRegister.value = false;
+
+    fetchBooks();
 };
 
 const onLogout = () => {
     isLoggedIn.value = false;
 };
+
+// TODO: criar roteador
+const showRegister = ref(false);
 </script>
 
 <template>
-    <Login v-if="!isLoggedIn" @login-success="onLoginSuccess" />
+    <Login v-if="!isLoggedIn && !showRegister" @login-success="onLoginSuccess" @goto-register="showRegister = true" />
+    <Register v-else-if="showRegister" @login-success="onLoginSuccess" @goto-login="showRegister = false"/>
     <div v-else class="min-h-screen bg-slate-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
         <TheNavbar @open-modal="openCreateModal" @logout="onLogout" />
         <main class="max-w-7xl mx-auto p-6">
