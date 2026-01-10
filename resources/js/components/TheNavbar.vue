@@ -1,9 +1,17 @@
 <script setup>
+import AuthService from '../services/AuthService';
+
 import Button from 'primevue/button';
+
 import logoDark from '../assets/logo_black.png';
 import logoLight from '../assets/logo_white.png';
 
-defineEmits(['open-modal']);
+const emit = defineEmits(['open-modal', 'logout']);
+
+const handleLogout = async () => {
+    AuthService.logout();
+    emit('logout');
+};
 </script>
 
 <template>
@@ -20,6 +28,14 @@ defineEmits(['open-modal']);
                         <Button label="Novo Livro" icon="pi pi-plus" severity="primary" raised
                             @click="$emit('open-modal')" />
                     </div>
+                    <Button 
+                        label="Sair" 
+                        icon="pi pi-sign-out" 
+                        severity="secondary" 
+                        text
+                        @click="handleLogout"
+                        class="!px-3"
+                    />
                 </div>
             </div>
         </div>

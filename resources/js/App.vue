@@ -1,10 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import BookService from './services/BookService';
+import AuthService from './services/AuthService';
 
 import TheNavbar from './components/TheNavbar.vue';
 import BookForm from './components/Books/BookForm.vue';
 import BookList from './components/Books/BookList.vue';
+import Login from './components/Login.vue';
 
 import Dialog from 'primevue/dialog';
 import ConfirmDialog from 'primevue/confirmdialog';
@@ -60,7 +62,7 @@ const confirmDelete = (book) => {
             severity: 'danger'
         },
         accept: async () => {
-            
+
             try {
                 await BookService.delete(book.id);
                 fetchBooks();
@@ -70,39 +72,38 @@ const confirmDelete = (book) => {
         },
     });
 };
+
+const isLoggedIn = ref(AuthService.isAuthenticated());
+
+const onLoginSuccess = () => {
+    isLoggedIn.value = true;
+};
+
+const onLogout = () => {
+    isLoggedIn.value = false;
+};
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
-    <TheNavbar @open-modal="openCreateModal" />
-    <main class="max-w-7xl mx-auto p-6">
-        <BookList :books="books" @edit="openEditModal" @delete="confirmDelete" />
-    </main>
-    <Dialog 
-        v-model:visible="isModalVisible" 
-        modal 
-        :header="selectedBook ? 'Editar Livro' : 'Adicionar Novo Livro'" 
-        :style="{ width: '50rem' }" 
-        :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-        dismissableMask
-        class="dark:bg-gray-900"
-    >
-        <div class="pt-2">
-            <BookForm 
-                :bookToEdit="selectedBook" 
-                @created="onBookSaved"  
-                @updated="onBookSaved" 
-                class="!shadow-none !border-0 !p-0" 
-            />
-        </div>
-    </Dialog>
-    <ConfirmDialog class="max-w-md" />
-  </div>
-    <button 
-        @click="openCreateModal"
+    <Login v-if="!isLoggedIn" @login-success="onLoginSuccess" />
+    <div v-else class="min-h-screen bg-slate-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+        <TheNavbar @open-modal="openCreateModal" @logout="onLogout" />
+        <main class="max-w-7xl mx-auto p-6">
+            <BookList :books="books" @edit="openEditModal" @delete="confirmDelete" />
+        </main>
+        <Dialog v-model:visible="isModalVisible" modal :header="selectedBook ? 'Editar Livro' : 'Adicionar Novo Livro'"
+            :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" dismissableMask
+            class="dark:bg-gray-900">
+            <div class="pt-2">
+                <BookForm :bookToEdit="selectedBook" @created="onBookSaved" @updated="onBookSaved"
+                    class="!shadow-none !border-0 !p-0" />
+            </div>
+        </Dialog>
+        <ConfirmDialog class="max-w-md" />
+    </div>
+    <button @click="openCreateModal"
         class="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center text-2xl z-50 md:hidden transition-transform active:scale-90"
-        aria-label="Adicionar Livro"
-    >
+        aria-label="Adicionar Livro">
         <i class="pi pi-plus"></i>
     </button>
 </template>

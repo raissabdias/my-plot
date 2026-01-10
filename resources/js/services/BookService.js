@@ -1,47 +1,43 @@
-import axios from 'axios';
-
-const API_URL = '/api/books';
+import http from './http';
 
 export default {
     /**
-     * Busca todos os livros da estante
+     * Buscar todos os livros
      */
-    getAll() {
-        return axios.get(API_URL);
+    async getAll() {
+        return await http.get('/books'); 
     },
 
     /**
-     * Cria um novo livro
-     * @param {Object} bookData 
+     * Adicionar um novo livro
+     * @param {object} book 
      */
-    create(bookData) {
-        return axios.post(API_URL, bookData);
+    async create(book) {
+        return await http.post('/books', book);
     },
 
     /**
-     * Busca no Google Books (via nosso Backend)
-     * @param {String} query Termo de busca
+     * Atualizar um livro existente
+     * @param {number} id 
+     * @param {object} book 
      */
-    searchGoogle(query) {
-        return axios.get(`${API_URL}/search`, {
-            params: { q: query }
-        });
+    async update(id, book) {
+        return await http.put(`/books/${id}`, book);
     },
 
     /**
-     * Atualiza um livro existente
-     * @param {Number} id - ID do livro
-     * @param {Object} bookData - Dados atualizados
+     * Remover um livro
+     * @param {number} id 
      */
-    update(id, bookData) {
-        return axios.put(`${API_URL}/${id}`, bookData);
+    async delete(id) {
+        return await http.delete(`/books/${id}`);
     },
 
     /**
-     * Remove um livro da estante
-     * @param {Number} id - O ID do livro a ser apagado
+     * Buscar livros na API do Google Books
+     * @param {string} query
      */
-    delete(id) {
-        return axios.delete(`${API_URL}/${id}`);
-    },
+    async searchGoogle(query) {
+        return await http.get(`/books/search?query=${query}`);
+    }
 };
