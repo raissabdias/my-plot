@@ -15,7 +15,18 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        return $request->user()->books()->latest()->get();
+        $query = $request->user()->books()->latest();
+
+        # Search term filtering
+        if ($request->has('search') && $request->search) {
+            $search = '%' . $request->search . '%';
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', $search)
+                  ->orWhere('author', 'like', $search);
+            });
+        }
+
+        return $query->get();
     }
 
     /**

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import BookService from './services/BookService';
 import AuthService from './services/AuthService';
 
@@ -9,6 +9,9 @@ import BookList from './components/Books/BookList.vue';
 import Login from './components/Login.vue';
 import Register from './components/Register.vue';
 
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+import InputText from 'primevue/inputtext';
 import Dialog from 'primevue/dialog';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from "primevue/useconfirm";
@@ -19,7 +22,7 @@ const selectedBook = ref(null);
 
 const fetchBooks = async () => {
     try {
-        const response = await BookService.getAll();
+        const response = await BookService.getAll(filters.value);
         books.value = response.data;
     } catch (error) {
         console.error("Error fetching books:", error);
@@ -89,6 +92,14 @@ const onLogout = () => {
 
 // TODO: criar roteador
 const showRegister = ref(false);
+
+const filters = ref({
+    search: ''
+});
+
+watch(filters, () => {
+    fetchBooks();
+}, { deep: true });
 </script>
 
 <template>
@@ -97,6 +108,12 @@ const showRegister = ref(false);
     <div v-else class="min-h-screen bg-slate-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
         <TheNavbar @open-modal="openCreateModal" @logout="onLogout" />
         <main class="max-w-7xl mx-auto p-6">
+            <div class="flex flex-col md:flex-row justify-end gap-4 mb-8">
+                <IconField iconPosition="left" class="w-full md:w-64">
+                    <InputIcon class="pi pi-search"> </InputIcon>
+                    <InputText v-model="filters.search" placeholder="Buscar na estante..." class="w-full" />
+                </IconField>
+            </div>
             <BookList :books="books" @edit="openEditModal" @delete="confirmDelete" />
         </main>
         <Dialog v-model:visible="isModalVisible" modal :header="selectedBook ? 'Editar Livro' : 'Adicionar Novo Livro'"

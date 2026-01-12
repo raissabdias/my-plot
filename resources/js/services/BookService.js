@@ -4,8 +4,8 @@ export default {
     /**
      * Buscar todos os livros
      */
-    async getAll() {
-        return await http.get('/books'); 
+    async getAll(params = {}) {
+        return await http.get('/books', { params }); 
     },
 
     /**
