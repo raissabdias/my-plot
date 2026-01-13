@@ -26,6 +26,11 @@ class BookController extends Controller
             });
         }
 
+        # Status filtering
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
         return $query->get();
     }
 

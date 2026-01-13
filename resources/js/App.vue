@@ -12,6 +12,7 @@ import Register from './components/Register.vue';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import InputText from 'primevue/inputtext';
+import SelectButton from 'primevue/selectbutton';
 import Dialog from 'primevue/dialog';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from "primevue/useconfirm";
@@ -100,11 +101,18 @@ const filters = ref({
 watch(filters, () => {
     fetchBooks();
 }, { deep: true });
+
+const statusOptions = ref([
+    { label: 'Todos', value: null },
+    { label: 'Lendo', value: 'reading' },
+    { label: 'Quero Ler', value: 'planning_to_read' },
+    { label: 'Lido', value: 'read' }
+]);
 </script>
 
 <template>
     <Login v-if="!isLoggedIn && !showRegister" @login-success="onLoginSuccess" @goto-register="showRegister = true" />
-    <Register v-else-if="showRegister" @login-success="onLoginSuccess" @goto-login="showRegister = false"/>
+    <Register v-else-if="showRegister" @login-success="onLoginSuccess" @goto-login="showRegister = false" />
     <div v-else class="min-h-screen bg-slate-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
         <TheNavbar @open-modal="openCreateModal" @logout="onLogout" />
         <main class="max-w-7xl mx-auto p-6">
@@ -113,6 +121,7 @@ watch(filters, () => {
                     <InputIcon class="pi pi-search"> </InputIcon>
                     <InputText v-model="filters.search" placeholder="Buscar na estante..." class="w-full" />
                 </IconField>
+                <SelectButton v-model="filters.status" :options="statusOptions" optionLabel="label" optionValue="value" aria-labelledby="basic" class="w-full md:w-auto" />
             </div>
             <BookList :books="books" @edit="openEditModal" @delete="confirmDelete" />
         </main>
