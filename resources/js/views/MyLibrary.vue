@@ -104,7 +104,11 @@ const filters = ref({
     page: 1,
 });
 
-watch(filters, () => {
+// Filtrar livros quando os filtros mudarem
+watch(filters, (newVal, oldVal) => {
+    if (newVal.search !== oldVal.search || newVal.status !== oldVal.status) {
+        filters.value.page = 1;
+    }
     fetchBooks();
 }, { deep: true });
 
@@ -130,13 +134,20 @@ const onPageChange = (event) => {
     <div class="min-h-screen bg-slate-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
         <TheNavbar @open-modal="openCreateModal" @logout="handleLogout" />
         <main class="max-w-7xl mx-auto p-6">
-            <div class="flex flex-col md:flex-row justify-end gap-4 mb-8">
+            <div class="flex flex-col md:flex-row justify-between gap-4 mb-8">
+                <span class="text-sm text-gray-600 dark:text-gray-400 pt-4">
+                    <span v-if="totalRecords > 0">
+                        Total de <strong>{{ totalRecords }}</strong> livro(s) encontrado(s).
+                    </span>
+                    <span v-else>
+                        Nenhum livro encontrado.
+                    </span>
+                </span>
+                <SelectButton v-model="filters.status" :options="statusOptions" optionLabel="label" optionValue="value" aria-labelledby="basic" class="w-full md:w-auto" />
                 <IconField iconPosition="left" class="w-full md:w-64">
                     <InputIcon class="pi pi-search"> </InputIcon>
                     <InputText v-model="filters.search" placeholder="Buscar na estante..." class="w-full" />
                 </IconField>
-                <SelectButton v-model="filters.status" :options="statusOptions" optionLabel="label" optionValue="value"
-                    aria-labelledby="basic" class="w-full md:w-auto" />
             </div>
             <BookList :books="books" @edit="openEditModal" @delete="confirmDelete" />
             <div v-if="totalRecords > 0" class="mt-6 flex justify-center">
