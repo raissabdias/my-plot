@@ -1,5 +1,7 @@
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Button from 'primevue/button';
@@ -15,7 +17,8 @@ const confirmPassword = ref('');
 
 const loading = ref(false);
 const errorMessage = ref('');
-const emit = defineEmits(['login-success', 'goto-login']);
+
+const router = useRouter();
 
 const handleRegister = async () => {
     loading.value = true;
@@ -29,7 +32,7 @@ const handleRegister = async () => {
 
     try {
         await AuthService.register({ name: name.value, email: email.value, password: password.value, password_confirmation: confirmPassword.value });
-        emit('login-success'); 
+        router.push('/');
 
     } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
@@ -74,7 +77,7 @@ const handleRegister = async () => {
                 <Button type="submit" label="Cadastrar" icon="pi pi-user-plus" :loading="loading" class="w-full mt-2" />
             </form>
             <div class="mt-6 text-center text-sm text-gray-500">
-                Já tem uma conta? <a href="#" @click.prevent="emit('goto-login')" class="text-indigo-600 font-bold hover:underline">Faça login</a>
+                Já tem uma conta? <router-link to="/login" class="text-indigo-600 font-bold hover:underline">Faça login</router-link>
             </div>
         </div>
     </div>

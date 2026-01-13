@@ -1,5 +1,7 @@
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Button from 'primevue/button';
@@ -13,7 +15,7 @@ const password = ref('');
 const loading = ref(false);
 const errorMessage = ref('');
 
-const emit = defineEmits(['login-success', 'goto-register']);
+const router = useRouter();
 
 const handleLogin = async () => {
     loading.value = true;
@@ -21,7 +23,7 @@ const handleLogin = async () => {
 
     try {
         await AuthService.login(email.value, password.value);
-        emit('login-success'); 
+        router.push('/'); 
 
     } catch (error) {
         console.error(error);
@@ -55,7 +57,7 @@ const handleLogin = async () => {
                 <Button type="submit" label="Entrar na Estante" icon="pi pi-sign-in" :loading="loading" class="w-full mt-2" />
             </form>
             <div class="mt-6 text-center text-sm text-gray-500">
-                Não tem conta? <a href="#" @click.prevent="emit('goto-register')" class="text-indigo-600 font-bold hover:underline">Cadastre-se</a>
+                Não tem conta? <router-link to="/register" class="text-indigo-600 font-bold hover:underline">Cadastre-se</router-link>
             </div>
         </div>
     </div>
