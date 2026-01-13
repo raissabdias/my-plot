@@ -1,4 +1,6 @@
 <script setup>
+import { useRouter } from 'vue-router';
+
 import AuthService from '../services/AuthService';
 
 import Button from 'primevue/button';
@@ -6,11 +8,13 @@ import Button from 'primevue/button';
 import logoDark from '../assets/logo_black.png';
 import logoLight from '../assets/logo_white.png';
 
-const emit = defineEmits(['open-modal', 'logout']);
+const emit = defineEmits(['open-modal']);
+
+const router = useRouter();
 
 const handleLogout = async () => {
-    AuthService.logout();
-    emit('logout');
+    await AuthService.logout(); 
+    router.push('/login');
 };
 </script>
 
@@ -20,8 +24,10 @@ const handleLogout = async () => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <div class="flex-shrink-0 flex items-center">
-                    <img :src="logoDark" alt="My Plot Logo" class="h-14 w-auto block dark:hidden" />
-                    <img :src="logoLight" alt="My Plot Logo" class="h-14 w-auto hidden dark:block" />
+                    <router-link to="/">
+                        <img :src="logoDark" alt="My Plot Logo" class="h-14 w-auto block dark:hidden" />
+                        <img :src="logoLight" alt="My Plot Logo" class="h-14 w-auto hidden dark:block" />
+                    </router-link>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="hidden md:block">

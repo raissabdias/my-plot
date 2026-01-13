@@ -23,11 +23,14 @@ export default {
     /**
      * Apaga o token do navegador (Logout)
      */
-    logout() {
-        http.post('/logout').catch(() => {});
-
-        localStorage.removeItem('user_token');
-        localStorage.removeItem('user_data');
+    async logout() {
+        try {
+            await http.post('/logout');
+        } catch (error) {
+        } finally {
+            localStorage.removeItem('user_token');
+            localStorage.removeItem('user_data');
+        }
     },
 
     /**
