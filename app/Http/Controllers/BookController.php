@@ -31,7 +31,10 @@ class BookController extends Controller
             $query->where('status', $request->status);
         }
 
-        return $query->get();
+        # Pagination (default 10 per page)
+        $perPage = $request->input('per_page', 10);
+
+        return $query->paginate($perPage);
     }
 
     /**

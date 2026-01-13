@@ -16,6 +16,7 @@ import SelectButton from 'primevue/selectbutton';
 import Dialog from 'primevue/dialog';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from "primevue/useconfirm";
+import Paginator from 'primevue/paginator';
 
 const books = ref([]);
 const isModalVisible = ref(false);
@@ -23,10 +24,18 @@ const selectedBook = ref(null);
 
 const router = useRouter();
 
+const rowsPerPage = ref(10);
+
 const fetchBooks = async () => {
     try {
-        const response = await BookService.getAll(filters.value);
-        books.value = response.data;
+        const params = {
+            ...filters.value,
+            per_page: rowsPerPage.value 
+        }
+
+        const response = await BookService.getAll(params);
+        books.value = response.data.data;
+        totalRecords.value = response.data.total;
     } catch (error) {
         console.error("Error fetching books:", error);
     }
@@ -49,6 +58,13 @@ const onBookSaved = () => {
 };
 
 onMounted(() => {
+    // Variar a quantidade de linhas por página com base no tamanho da tela (mobile)
+    if (window.innerWidth < 768) {
+        rowsPerPage.value = 4;
+    } else {
+        rowsPerPage.value = 10;
+    }
+
     fetchBooks();
 });
 
@@ -80,8 +96,12 @@ const confirmDelete = (book) => {
     });
 };
 
+const totalRecords = ref(0);
+
 const filters = ref({
-    search: ''
+    status: null,
+    search: '',
+    page: 1,
 });
 
 watch(filters, () => {
@@ -99,6 +119,11 @@ const handleLogout = () => {
     AuthService.logout();
     router.push('/login');
 };
+
+const onPageChange = (event) => {
+    filters.value.page = event.page + 1;
+    fetchBooks();
+};
 </script>
 
 <template>
@@ -110,9 +135,13 @@ const handleLogout = () => {
                     <InputIcon class="pi pi-search"> </InputIcon>
                     <InputText v-model="filters.search" placeholder="Buscar na estante..." class="w-full" />
                 </IconField>
-                <SelectButton v-model="filters.status" :options="statusOptions" optionLabel="label" optionValue="value" aria-labelledby="basic" class="w-full md:w-auto" />
+                <SelectButton v-model="filters.status" :options="statusOptions" optionLabel="label" optionValue="value"
+                    aria-labelledby="basic" class="w-full md:w-auto" />
             </div>
             <BookList :books="books" @edit="openEditModal" @delete="confirmDelete" />
+            <div v-if="totalRecords > 0" class="mt-6 flex justify-center">
+                <Paginator :rows="rowsPerPage" :totalRecords="totalRecords" @page="onPageChange" template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" />
+            </div>
         </main>
         <Dialog v-model:visible="isModalVisible" modal :header="selectedBook ? 'Editar Livro' : 'Adicionar Novo Livro'"
             :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" dismissableMask
