@@ -7,6 +7,7 @@ import AutoComplete from 'primevue/autocomplete';
 import Rating from 'primevue/rating';
 import Dropdown from 'primevue/dropdown';
 import Textarea from 'primevue/textarea';
+import { useToast } from 'primevue/usetoast';
 
 const props = defineProps({
     bookToEdit: {
@@ -16,6 +17,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['created', 'updated']);
+
+const toast = useToast();
 
 const title = ref('');
 const author = ref('');
@@ -95,13 +98,16 @@ const saveBook = async () => {
         if (props.bookToEdit) {
             await BookService.update(props.bookToEdit.id, payload);
             emit('updated');
+            toast.add({severity:'success', summary: 'Sucesso', detail: 'Livro atualizado com sucesso.', life: 3000});
         } else {
             await BookService.create(payload);
             emit('created');
+            toast.add({severity:'success', summary: 'Sucesso', detail: 'Livro salvo com sucesso.', life: 3000});
         }
         resetForm();
     } catch (error) {
         console.error("Erro ao salvar:", error);
+        toast.add({severity:'error', summary: 'Erro', detail: 'Não foi possível salvar o livro.', life: 3000});
     }
 };
 

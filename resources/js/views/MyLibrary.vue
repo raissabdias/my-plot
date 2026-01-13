@@ -18,11 +18,14 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from "primevue/useconfirm";
 import Paginator from 'primevue/paginator';
 
+import { useToast } from 'primevue/usetoast';
+
 const books = ref([]);
 const isModalVisible = ref(false);
 const selectedBook = ref(null);
 
 const router = useRouter();
+const toast = useToast();
 
 const rowsPerPage = ref(10);
 
@@ -88,9 +91,11 @@ const confirmDelete = (book) => {
 
             try {
                 await BookService.delete(book.id);
+                toast.add({severity:'success', summary: 'Sucesso', detail: 'Livro excluído com sucesso.', life: 3000});
                 fetchBooks();
             } catch (error) {
                 console.error("Erro ao excluir", error);
+                toast.add({severity:'error', summary: 'Erro', detail: 'Não foi possível excluir o livro.', life: 3000});
             }
         },
     });
@@ -104,13 +109,22 @@ const filters = ref({
     page: 1,
 });
 
-// Filtrar livros quando os filtros mudarem
-watch(filters, (newVal, oldVal) => {
-    if (newVal.search !== oldVal.search || newVal.status !== oldVal.status) {
+// Filtrar livros quando os filtros/busca mudarem
+watch(
+    [() => filters.value.search, () => filters.value.status],
+    () => {
         filters.value.page = 1;
+        fetchBooks();
     }
-    fetchBooks();
-}, { deep: true });
+);
+
+// Alterar página
+watch(
+    () => filters.value.page,
+    () => {
+        fetchBooks();
+    }
+);
 
 const statusOptions = ref([
     { label: 'Todos', value: null },
