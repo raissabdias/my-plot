@@ -1,5 +1,5 @@
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 import AuthService from '../services/AuthService';
 
@@ -11,6 +11,7 @@ import logoLight from '../assets/logo_white.png';
 const emit = defineEmits(['open-modal']);
 
 const router = useRouter();
+const route = useRoute();
 
 const handleLogout = async () => {
     await AuthService.logout(); 
@@ -30,7 +31,16 @@ const handleLogout = async () => {
                     </router-link>
                 </div>
                 <div class="flex items-center gap-4">
-                    <div class="hidden md:block">
+                    <router-link to="/library" v-if="route.path !== '/library'">
+                        <Button 
+                            label="Minha Estante" 
+                            icon="pi pi-book" 
+                            severity="secondary" 
+                            text 
+                            class="hidden md:flex" 
+                        />
+                    </router-link>
+                    <div class="hidden md:block" v-if="route.path === '/library'">
                         <Button label="Novo Livro" icon="pi pi-plus" severity="primary" raised
                             @click="$emit('open-modal')" />
                     </div>
