@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: my-plot
+    env: php
+    region: ohio
+    plan: free
+    buildCommand: npm install && npm run build && composer install --no-dev --optimize-autoloader && php artisan migrate --force
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_NAME
+        value: MyPlot
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        sync: false
+      - key: APP_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
