@@ -18,11 +18,15 @@ class Book extends Model
         'isbn',
         'status',
         'rating',
-        'review'
+        'review',
+        'started_reading_at',
+        'finished_reading_at',
     ];
 
     protected $casts = [
         'status' => BookStatus::class,
+        'started_reading_at' => 'datetime',
+        'finished_reading_at' => 'datetime',
     ];
 
     protected $appends = [

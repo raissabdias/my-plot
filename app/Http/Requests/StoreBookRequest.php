@@ -26,6 +26,10 @@ class StoreBookRequest extends FormRequest
             'isbn' => 'nullable|string', 
             'image_url' => 'nullable|url', 
             'review' => 'nullable|string', 
+            'status' => 'required|in:read,reading,planning_to_read',
+            'rating' => 'nullable|integer|min:0|max:5',
+            'started_reading_at' => 'nullable|date',
+            'finished_reading_at' => 'nullable|date|after_or_equal:started_reading_at'
         ];
     }
 }

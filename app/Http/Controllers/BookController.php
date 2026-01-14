@@ -49,7 +49,9 @@ class BookController extends Controller
             'status' => $request->status,
             'rating' => $request->rating,
             'image_url' => $request->image_url,
-            'review' => $request->review
+            'review' => $request->review,
+            'started_reading_at' => $request->started_reading_at,
+            'finished_reading_at' => $request->finished_reading_at,
         ]);
 
         return response()->json($book, 201);
@@ -84,6 +86,8 @@ class BookController extends Controller
             'status' => $request->status,
             'rating' => $request->rating,
             'review' => $request->review,
+            'started_reading_at' => $request->started_reading_at,
+            'finished_reading_at' => $request->finished_reading_at,
         ]);
 
         return response()->json($book);

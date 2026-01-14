@@ -7,6 +7,7 @@ import AutoComplete from 'primevue/autocomplete';
 import Rating from 'primevue/rating';
 import Dropdown from 'primevue/dropdown';
 import Textarea from 'primevue/textarea';
+import DatePicker from 'primevue/datepicker';
 import { useToast } from 'primevue/usetoast';
 
 const props = defineProps({
@@ -27,6 +28,8 @@ const imageUrl = ref('');
 const status = ref(null);
 const rating = ref(0);
 const review = ref('');
+const started_reading_at = ref(null);
+const finished_reading_at = ref(null);
 
 const selectedBookSearch = ref(null);
 const suggestions = ref([]);
@@ -46,6 +49,8 @@ const resetForm = () => {
     rating.value = 0;
     review.value = '';
     selectedBookSearch.value = null;
+    started_reading_at.value = null;
+    finished_reading_at.value = null;
 };
 
 watch(() => props.bookToEdit, (newBook) => {
@@ -57,6 +62,8 @@ watch(() => props.bookToEdit, (newBook) => {
         status.value = newBook.status; 
         rating.value = newBook.rating || 0;
         review.value = newBook.review; 
+        started_reading_at.value = newBook.started_reading_at ? new Date(newBook.started_reading_at) : null;
+        finished_reading_at.value = newBook.finished_reading_at ? new Date(newBook.finished_reading_at) : null;
     } else {
         resetForm();
     }
@@ -91,7 +98,9 @@ const saveBook = async () => {
         image_url: imageUrl.value,
         status: status.value,
         rating: rating.value,
-        review: review.value
+        review: review.value,
+        started_reading_at: started_reading_at.value,
+        finished_reading_at: finished_reading_at.value
     };
 
     try {
@@ -181,6 +190,16 @@ const buttonLabel = computed(() => props.bookToEdit ? 'Atualizar Livro' : 'Adici
                         <div class="h-[42px] flex items-center">
                             <Rating v-model="rating" :cancel="false" />
                         </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                    <div v-if="status === 'read' || status === 'reading'" class="flex flex-col gap-2">
+                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Início da Leitura</label>
+                        <DatePicker v-model="started_reading_at" dateFormat="dd/mm/yy" class="w-full"/>
+                    </div>
+                    <div v-if="status === 'read'" class="flex flex-col gap-2">
+                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Término da Leitura</label>
+                        <DatePicker v-model="finished_reading_at" dateFormat="dd/mm/yy" class="w-full"/>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2">
