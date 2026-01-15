@@ -51,10 +51,10 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 # 14. Expor porta
 EXPOSE 80
 
-# 15. Iniciar (Mantendo sua limpeza de cache que estava certa)
+# 15. Iniciar o Apache e rodar comandos do Laravel
 CMD php artisan optimize:clear && \
-    php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache && \
+    php artisan config:clear && \
+    php artisan route:clear && \
+    php artisan view:clear && \
     php artisan migrate --force && \
     apache2-foreground
