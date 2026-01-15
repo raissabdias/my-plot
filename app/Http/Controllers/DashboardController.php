@@ -24,14 +24,23 @@ class DashboardController extends Controller
 
         # Total books in the last 6 months grouped by month
         $monthlyReads = $user->books()
-            ->toBase()
             ->where('status', 'read')
             ->whereNotNull('finished_reading_at')
             ->where('finished_reading_at', '>=', Carbon::now()->subMonths(6))
-            ->selectRaw("DATE_FORMAT(finished_reading_at, '%Y-%m') as month, DATE_FORMAT(finished_reading_at, '%m/%Y') as label, count(*) as count")
-            ->groupBy('month', 'label')
-            ->orderBy('month')
-            ->get();
+            ->orderBy('finished_reading_at')
+            ->get()
+            ->groupBy(function($val) {
+                return Carbon::parse($val->finished_reading_at)->format('Y-m');
+            })
+            ->map(function ($group) {
+                $date = Carbon::parse($group->first()->finished_reading_at);
+                return [
+                    'month' => $date->format('Y-m'),
+                    'label' => $date->format('m/Y'),
+                    'count' => $group->count()
+                ];
+            })
+            ->values();
 
         return response()->json([
             'counts' => $counts,
