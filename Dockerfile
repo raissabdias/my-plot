@@ -42,9 +42,7 @@ RUN npm run build
 # 11. Permissões
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# -----------------------------------------------------------
-# 12. MUDANÇA AQUI: Configurar Apache "Na marra"
-# -----------------------------------------------------------
+# 12. Configurar Apache "Na marra"
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
 # Cria um arquivo de configuração do site que permite .htaccess (AllowOverride All)
@@ -58,10 +56,15 @@ RUN echo "<VirtualHost *:80>" > /etc/apache2/sites-available/000-default.conf &&
     echo "    ErrorLog \${APACHE_LOG_DIR}/error.log" >> /etc/apache2/sites-available/000-default.conf && \
     echo "    CustomLog \${APACHE_LOG_DIR}/access.log combined" >> /etc/apache2/sites-available/000-default.conf && \
     echo "</VirtualHost>" >> /etc/apache2/sites-available/000-default.conf
-# -----------------------------------------------------------
+
 
 # 13. Expor porta
 EXPOSE 80
 
 # 14. Iniciar
-CMD php artisan migrate --force && apache2-foreground
+CMD php artisan optimize:clear && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache && \
+    php artisan migrate --force && \
+    apache2-foreground
