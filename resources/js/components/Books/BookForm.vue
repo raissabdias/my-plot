@@ -136,6 +136,7 @@ const buttonLabel = computed(() => props.bookToEdit ? 'Atualizar Livro' : 'Adici
                 placeholder="Busque o livro..." 
                 class="w-full"
                 inputClass="w-full"
+                panelClass="book-search-dropdown"
             >
                 <template #option="slotProps">
                     <div class="flex items-center gap-2">
@@ -213,3 +214,16 @@ const buttonLabel = computed(() => props.bookToEdit ? 'Atualizar Livro' : 'Adici
         </div>
     </div>
 </template>
+<style>
+.book-search-dropdown {
+    max-width: 350px !important; /* Ajuste o tamanho que achar melhor */
+    width: 100%; /* Garante que tente ocupar o espaço disponível até o max */
+}
+
+.book-search-dropdown .p-autocomplete-item {
+    white-space: normal !important; 
+    line-height: 1.4;
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+</style>
