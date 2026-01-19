@@ -20,6 +20,7 @@ import Paginator from 'primevue/paginator';
 
 import { useToast } from 'primevue/usetoast';
 
+const loading = ref(true);
 const books = ref([]);
 const isModalVisible = ref(false);
 const selectedBook = ref(null);
@@ -41,6 +42,8 @@ const fetchBooks = async () => {
         totalRecords.value = response.data.total;
     } catch (error) {
         console.error("Error fetching books:", error);
+    } finally {
+        loading.value = false;
     }
 };
 
@@ -163,7 +166,7 @@ const onPageChange = (event) => {
                     <InputText v-model="filters.search" placeholder="Buscar na estante..." class="w-full" />
                 </IconField>
             </div>
-            <BookList :books="books" @edit="openEditModal" @delete="confirmDelete" />
+            <BookList :books="books" :loading="loading" @edit="openEditModal" @delete="confirmDelete" />
             <div v-if="totalRecords > 0" class="mt-6 flex justify-center">
                 <Paginator :rows="rowsPerPage" :totalRecords="totalRecords" @page="onPageChange" template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" />
             </div>
