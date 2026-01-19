@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\BookStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 
 class Book extends Model
 {
@@ -53,5 +55,32 @@ class Book extends Model
             'color' => $this->status->color(),
             'icon' => $this->status->icon(),
         ];
+    }
+
+    /**
+     * Scope a query to only include read books
+     */
+    #[Scope]
+    protected function read(Builder $query): void
+    {
+        $query->where('status', BookStatus::READ->value);
+    }
+
+    /**
+     * Scope a query to only include reading books
+     */
+    #[Scope]
+    protected function reading(Builder $query): void
+    {
+        $query->where('status', BookStatus::READING->value);
+    }
+
+    /**
+     * Scope a query to only include planning to read books
+     */
+    #[Scope]
+    protected function planning(Builder $query): void
+    {
+        $query->where('status', BookStatus::PLANNING->value);
     }
 }

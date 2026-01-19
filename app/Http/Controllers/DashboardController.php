@@ -19,14 +19,14 @@ class DashboardController extends Controller
         # General book counts
         $counts = [
             'total' => $user->books()->count(),
-            'read' => $user->books()->where('status', 'read')->count(),
-            'reading' => $user->books()->where('status', 'reading')->count(),
-            'planning' => $user->books()->where('status', 'planning_to_read')->count(),
+            'read' => $user->books()->read()->count(),
+            'reading' => $user->books()->reading()->count(),
+            'planning' => $user->books()->planning()->count(),
         ];
 
         # Total books in the last 6 months grouped by month
         $monthlyReads = $user->books()
-            ->where('status', 'read')
+            ->read()
             ->whereNotNull('finished_reading_at')
             ->where('finished_reading_at', '>=', Carbon::now()->subMonths(6))
             ->orderBy('finished_reading_at')
@@ -47,7 +47,7 @@ class DashboardController extends Controller
         # Reading goal for the current year
         $goal = $user->currentYearGoal()->first();
         $readThisYear = $user->books()
-            ->where('status', 'read')
+            ->read()
             ->whereYear('finished_reading_at', $currentYear)
             ->count();
         $goalData = null;
