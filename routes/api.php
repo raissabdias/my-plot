@@ -15,5 +15,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('books', BookController::class);
 
     Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    Route::post('/reading-goal', [DashboardController::class, 'storeGoal']);
 });
 
