@@ -214,6 +214,7 @@ const buttonLabel = computed(() => props.bookToEdit ? 'Atualizar Livro' : 'Adici
         </div>
     </div>
 </template>
+
 <style>
 .book-search-dropdown {
     max-width: 350px !important; /* Ajuste o tamanho que achar melhor */
