@@ -42,8 +42,11 @@ const handleFileUpload = async (event) => {
         // Atualizar avatar localmente
         user.value.avatar = data.avatar_url;
         localStorage.setItem('user_data', JSON.stringify(user.value));
-        toast.add({severity:'success', summary: 'Sucesso', detail: 'Foto de perfil atualizada.', life: 3000});
 
+        // Emitir evento global para atualizar navbar
+        window.dispatchEvent(new Event('user-updated'));
+
+        toast.add({severity:'success', summary: 'Sucesso', detail: 'Foto de perfil atualizada.', life: 3000});
     } catch (error) {
         console.error('Erro no upload:', error);
         toast.add({severity:'error', summary: 'Erro', detail: 'Falha ao enviar a imagem. Tente novamente.', life: 3000});

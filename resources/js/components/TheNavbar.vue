@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
 import AuthService from '../services/AuthService';
@@ -24,11 +24,24 @@ const handleLogout = async () => {
     router.push('/login');
 };
 
+// Dados do usuário a partir do localStorage
+const loadUserFromStorage = () => {
+    const userData = localStorage.getItem('user_data');
+    if (userData) {
+        user.value = JSON.parse(userData);
+    }
+};
+
 onMounted(() => {
     const userData = localStorage.getItem('user_data');
     if (userData) {
         user.value = JSON.parse(userData);
     }
+    window.addEventListener('user-updated', loadUserFromStorage);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('user-updated', loadUserFromStorage);
 });
 </script>
 
