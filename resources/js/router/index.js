@@ -6,12 +6,14 @@ import Login from '../components/Login.vue';
 import Register from '../components/Register.vue';
 import MyLibrary from '../views/MyLibrary.vue';
 import Dashboard from '../views/Dashboard.vue';
+import Profile from '../views/Profile.vue';
 
 const routes = [
     { path: '/login', name: 'Login', component: Login, meta: { guest: true } },
     { path: '/register', name: 'Register', component: Register, meta: { guest: true } },
     { path: '/library', name: 'MyLibrary', component: MyLibrary, meta: { requiresAuth: true } },
     { path: '/', name: 'Dashboard', component: Dashboard, meta: { requiresAuth: true } },
+    { path: '/profile', name: 'Profile', component: Profile, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
