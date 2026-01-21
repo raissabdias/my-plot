@@ -1,4 +1,5 @@
 <script setup>
+import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
 import AuthService from '../services/AuthService';
@@ -12,11 +13,23 @@ const emit = defineEmits(['open-modal']);
 
 const router = useRouter();
 const route = useRoute();
+const user = ref({});
+const defaultAvatar = 'https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff';
+
+// Menu dropdown (opcional, para mobile)
+const isMenuOpen = ref(false);
 
 const handleLogout = async () => {
-    await AuthService.logout(); 
+    await AuthService.logout();
     router.push('/login');
 };
+
+onMounted(() => {
+    const userData = localStorage.getItem('user_data');
+    if (userData) {
+        user.value = JSON.parse(userData);
+    }
+});
 </script>
 
 <template>
@@ -32,26 +45,32 @@ const handleLogout = async () => {
                 </div>
                 <div class="flex items-center gap-4">
                     <router-link to="/library" v-if="route.path !== '/library'">
-                        <Button 
-                            label="Minha Estante" 
-                            icon="pi pi-book" 
-                            severity="secondary" 
-                            text 
-                            class="hidden md:flex" 
-                        />
+                        <Button label="Minha Estante" icon="pi pi-book" severity="secondary" text
+                            class="hidden md:flex" />
                     </router-link>
                     <div class="hidden md:block" v-if="route.path === '/library'">
                         <Button label="Novo Livro" icon="pi pi-plus" severity="primary" raised
                             @click="$emit('open-modal')" />
                     </div>
-                    <Button 
-                        label="Sair" 
-                        icon="pi pi-sign-out" 
-                        severity="secondary" 
-                        text
-                        @click="handleLogout"
-                        class="!px-3"
-                    />
+                    <div class="flex items-center gap-4">
+                        <div v-if="user.id" class="flex items-center gap-4">
+                            <router-link to="/profile" class="flex items-center gap-3 hover:opacity-80 transition">
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-200 hidden md:block">
+                                    {{ user.name }}
+                                </span>
+                                <img :src="user.avatar || defaultAvatar" alt="Avatar"
+                                    class="w-9 h-9 rounded-full border-2 border-indigo-100 object-cover">
+                            </router-link>
+                            <button @click="handleLogout" class="text-gray-500 hover:text-red-500 transition ml-2"
+                                title="Sair">
+                                <i class="pi pi-sign-out text-xl"></i>
+                            </button>
+                        </div>
+                        <div v-else class="flex gap-2">
+                            <router-link to="/login"
+                                class="text-gray-600 hover:text-indigo-600 font-medium">Entrar</router-link>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

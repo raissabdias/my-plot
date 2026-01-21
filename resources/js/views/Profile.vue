@@ -23,15 +23,13 @@ const triggerFileInput = () => {
     fileInput.value.click();
 };
 
-// 2. Função que roda quando o usuário escolhe a foto
+// Atualizar foto de perfil
 const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Prepara o formulário para envio (FormData é obrigatório para arquivos)
     const formData = new FormData();
     formData.append('avatar', file);
-    console.log(formData);
 
     try {
         uploading.value = true;
@@ -41,9 +39,9 @@ const handleFileUpload = async (event) => {
             }
         });
 
+        // Atualizar avatar localmente
         user.value.avatar = data.avatar_url;
         localStorage.setItem('user_data', JSON.stringify(user.value));
-
         toast.add({severity:'success', summary: 'Sucesso', detail: 'Foto de perfil atualizada.', life: 3000});
 
     } catch (error) {
