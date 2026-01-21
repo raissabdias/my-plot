@@ -1,10 +1,16 @@
-<script setup>  
+<script setup>
 import { ref, onMounted } from 'vue';
 
+import http from '@/services/http';
 import TheNavbar from '../components/TheNavbar.vue';
+import { useToast } from 'primevue/usetoast';
+
+const toast = useToast();
 
 const user = ref({});
 const defaultAvatar = 'https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff';
+const fileInput = ref(null);
+const uploading = ref(false);
 
 onMounted(() => {
     const userData = localStorage.getItem('user_data');
@@ -12,6 +18,41 @@ onMounted(() => {
         user.value = JSON.parse(userData);
     }
 });
+
+const triggerFileInput = () => {
+    fileInput.value.click();
+};
+
+// 2. Função que roda quando o usuário escolhe a foto
+const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Prepara o formulário para envio (FormData é obrigatório para arquivos)
+    const formData = new FormData();
+    formData.append('avatar', file);
+    console.log(formData);
+
+    try {
+        uploading.value = true;
+        const { data } = await http.post('/profile/avatar', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        user.value.avatar = data.avatar_url;
+        localStorage.setItem('user_data', JSON.stringify(user.value));
+
+        toast.add({severity:'success', summary: 'Sucesso', detail: 'Foto de perfil atualizada.', life: 3000});
+
+    } catch (error) {
+        console.error('Erro no upload:', error);
+        toast.add({severity:'error', summary: 'Erro', detail: 'Falha ao enviar a imagem. Tente novamente.', life: 3000});
+    } finally {
+        uploading.value = false;
+    }
+};
 </script>
 
 <template>
@@ -23,11 +64,13 @@ onMounted(() => {
                 <div class="px-6 pb-8">
                     <div class="relative flex items-end -mt-12 mb-6">
                         <div class="relative">
-                            <img :src="user.avatar || defaultAvatar" alt="Avatar" class="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white">
-                            <button
-                                class="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full text-white hover:bg-indigo-700 transition shadow-lg">
-                                <i class="pi pi-camera"></i>
+                            <img :src="user.avatar || defaultAvatar" alt="Avatar"
+                                class="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white">
+                            <button @click="triggerFileInput" :disabled="uploading" class="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full text-white hover:bg-indigo-700 transition shadow-lg">
+                                <i v-if="uploading" class="pi pi-spin pi-spinner pi-fw"></i>
+                                <i v-else class="pi pi-camera pi-fw"></i>
                             </button>
+                            <input type="file" ref="fileInput" class="hidden" accept="image/*" @change="handleFileUpload">
                         </div>
                         <div class="ml-6 mb-2">
                             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ user.name }}</h1>
