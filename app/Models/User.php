@@ -71,4 +71,15 @@ class User extends Authenticatable
     {
         return $this->hasOne(ReadingGoal::class)->where('year', date('Y'));
     }
+
+    /**
+     * The global books in the user's bookshelf
+     */
+    public function bookshelf()
+    {
+        return $this->belongsToMany(GlobalBook::class, 'book_user')
+                    ->using(BookUser::class) // Já vamos criar esse arquivo abaixo
+                    ->withPivot('status', 'review', 'rating', 'started_at', 'finished_at')
+                    ->withTimestamps();
+    }
 }

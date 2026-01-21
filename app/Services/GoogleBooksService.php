@@ -28,9 +28,11 @@ class GoogleBooksService
             $isbn = $info['industryIdentifiers'][0]['identifier'] ?? null;
 
             return [
+                'id' => $item['id'],
                 'title' => $info['title'] ?? 'Sem Título',
                 'author' => $info['authors'][0] ?? 'Desconhecido',
                 'isbn' => $isbn,
+                'page_count' => $info['pageCount'] ?? null,
                 'image_url' => isset($info['imageLinks']['thumbnail']) 
                     ? str_replace('http://', 'https://', $info['imageLinks']['thumbnail']) 
                     : null,

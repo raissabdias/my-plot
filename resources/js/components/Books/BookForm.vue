@@ -18,21 +18,27 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['created', 'updated']);
-
 const toast = useToast();
 
+// Dados do Livro
+const google_book_id = ref(null);
 const title = ref('');
 const author = ref('');
 const isbn = ref('');
 const imageUrl = ref('');
+const page_count = ref(0);
+
+// Dados da Estante (Usuário)
 const status = ref(null);
 const rating = ref(0);
 const review = ref('');
-const started_reading_at = ref(null);
-const finished_reading_at = ref(null);
+const started_at = ref(null);
+const finished_at = ref(null);
 
+// Busca
 const selectedBookSearch = ref(null);
 const suggestions = ref([]);
+const isLoading = ref(false);
 
 const statusOptions = [
     { label: 'Quero Ler', value: 'planning_to_read' },
@@ -41,16 +47,26 @@ const statusOptions = [
 ];
 
 const resetForm = () => {
+    google_book_id.value = null;
     title.value = '';
     author.value = '';
     isbn.value = '';
     imageUrl.value = '';
+    page_count.value = 0;
     status.value = 'planning_to_read';
     rating.value = 0;
     review.value = '';
     selectedBookSearch.value = null;
-    started_reading_at.value = null;
-    finished_reading_at.value = null;
+    started_at.value = null;
+    finished_at.value = null;
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', { 
+        timeZone: 'UTC' 
+    });
 };
 
 watch(() => props.bookToEdit, (newBook) => {
@@ -59,16 +75,16 @@ watch(() => props.bookToEdit, (newBook) => {
         author.value = newBook.author;
         isbn.value = newBook.isbn;
         imageUrl.value = newBook.image_url;
-        status.value = newBook.status; 
+        status.value = newBook.status;
         rating.value = newBook.rating || 0;
-        review.value = newBook.review; 
-        started_reading_at.value = newBook.started_reading_at ? new Date(newBook.started_reading_at) : null;
-        finished_reading_at.value = newBook.finished_reading_at ? new Date(newBook.finished_reading_at) : null;
+        review.value = newBook.review;
+        started_at.value = newBook.started_at ? formatDate(newBook.started_at) : null;
+        finished_at.value = newBook.finished_at ? formatDate(newBook.finished_at) : null;
+        google_book_id.value = newBook.google_book_id || null;
     } else {
         resetForm();
     }
 }, { immediate: true });
-
 
 const searchBookParams = async (event) => {
     try {
@@ -85,62 +101,79 @@ const onBookSelect = (event) => {
     author.value = book.author;
     isbn.value = book.isbn;
     imageUrl.value = book.image_url;
+    google_book_id.value = book.id;
+    page_count.value = book.page_count || 0;
+
     selectedBookSearch.value = null;
 };
 
 const saveBook = async () => {
-    if (!title.value) return;
+    if (!title.value) {
+        toast.add({ severity: 'warn', summary: 'Atenção', detail: 'O título é obrigatório.', life: 3000 });
+        return;
+    }
+
+    if (!status.value) {
+        toast.add({ severity: 'warn', summary: 'Atenção', detail: 'Selecione um status de leitura.', life: 3000 });
+        return;
+    }
 
     const payload = {
+        google_book_id: google_book_id.value,
         title: title.value,
-        author: author.value,
+        authors: author.value,
         isbn: isbn.value,
         image_url: imageUrl.value,
+        page_count: page_count.value,
         status: status.value,
         rating: rating.value,
         review: review.value,
-        started_reading_at: started_reading_at.value,
-        finished_reading_at: finished_reading_at.value
+        started_at: started_at.value,
+        finished_at: finished_at.value
     };
 
     try {
+        isLoading.value = true;
+
         if (props.bookToEdit) {
-            await BookService.update(props.bookToEdit.id, payload);
+            await BookService.updateShelf(props.bookToEdit.id, payload);
             emit('updated');
-            toast.add({severity:'success', summary: 'Sucesso', detail: 'Livro atualizado com sucesso.', life: 3000});
-        } else {
-            await BookService.create(payload);
-            emit('created');
-            toast.add({severity:'success', summary: 'Sucesso', detail: 'Livro salvo com sucesso.', life: 3000});
+            toast.add({ severity: 'success', summary: 'Atualizado', detail: 'Livro atualizado com sucesso.', life: 3000 });
         }
+        else {
+            await BookService.addToShelf(payload);
+            emit('created');
+            toast.add({ severity: 'success', summary: 'Adicionado', detail: 'Livro adicionado à estante!', life: 3000 });
+        }
+
         resetForm();
+
     } catch (error) {
         console.error("Erro ao salvar:", error);
-        toast.add({severity:'error', summary: 'Erro', detail: 'Não foi possível salvar o livro.', life: 3000});
+        const errorMsg = error.response?.data?.message || 'Não foi possível salvar o livro.';
+        toast.add({ severity: 'error', summary: 'Erro', detail: errorMsg, life: 3000 });
+    } finally {
+        isLoading.value = false;
     }
 };
 
-const buttonLabel = computed(() => props.bookToEdit ? 'Atualizar Livro' : 'Adicionar Livro');
+const buttonLabel = computed(() => {
+    if (isLoading.value) return 'Salvando...';
+    return props.bookToEdit ? 'Atualizar Livro' : 'Adicionar à Estante';
+});
 </script>
 
 <template>
     <div class="flex flex-col gap-6 dark:bg-gray-900">
         <div v-if="!bookToEdit" class="flex flex-col gap-2">
             <label class="text-sm text-gray-500 dark:text-gray-400">Preenchimento automático via Google:</label>
-            <AutoComplete 
-                v-model="selectedBookSearch" 
-                :suggestions="suggestions" 
-                @complete="searchBookParams" 
-                @item-select="onBookSelect"
-                optionLabel="title"
-                placeholder="Busque o livro..." 
-                class="w-full"
-                inputClass="w-full"
-                panelClass="book-search-dropdown"
-            >
+            <AutoComplete v-model="selectedBookSearch" :suggestions="suggestions" @complete="searchBookParams"
+                @item-select="onBookSelect" optionLabel="title" placeholder="Busque o livro..." class="w-full"
+                inputClass="w-full" panelClass="book-search-dropdown">
                 <template #option="slotProps">
                     <div class="flex items-center gap-2">
-                        <img v-if="slotProps.option.image_url" :src="slotProps.option.image_url" class="w-8 h-12 object-cover" />
+                        <img v-if="slotProps.option.image_url" :src="slotProps.option.image_url"
+                            class="w-8 h-12 object-cover" />
                         <div class="flex flex-col">
                             <span class="font-bold">{{ slotProps.option.title }}</span>
                             <span class="text-xs text-gray-500">{{ slotProps.option.author }}</span>
@@ -155,7 +188,8 @@ const buttonLabel = computed(() => props.bookToEdit ? 'Atualizar Livro' : 'Adici
                 <div v-if="imageUrl" class="relative w-32 aspect-[2/3]">
                     <img :src="imageUrl" alt="Capa" class="w-full h-full object-cover rounded shadow-md" />
                 </div>
-                <div v-else class="w-32 aspect-[2/3] bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-gray-400 text-xs text-center p-2">
+                <div v-else
+                    class="w-32 aspect-[2/3] bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-gray-400 text-xs text-center p-2">
                     Sem Capa
                 </div>
             </div>
@@ -177,14 +211,8 @@ const buttonLabel = computed(() => props.bookToEdit ? 'Atualizar Livro' : 'Adici
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                     <div class="flex flex-col gap-2">
                         <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Status de Leitura</label>
-                        <Dropdown 
-                            v-model="status" 
-                            :options="statusOptions" 
-                            optionLabel="label" 
-                            optionValue="value"
-                            placeholder="Selecione..." 
-                            class="w-full"
-                        />
+                        <Dropdown v-model="status" :options="statusOptions" optionLabel="label" optionValue="value"
+                            placeholder="Selecione..." class="w-full" />
                     </div>
                     <div class="flex flex-col gap-2">
                         <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Sua Avaliação</label>
@@ -196,16 +224,17 @@ const buttonLabel = computed(() => props.bookToEdit ? 'Atualizar Livro' : 'Adici
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                     <div v-if="status === 'read' || status === 'reading'" class="flex flex-col gap-2">
                         <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Início da Leitura</label>
-                        <DatePicker v-model="started_reading_at" dateFormat="dd/mm/yy" class="w-full"/>
+                        <DatePicker v-model="started_at" dateFormat="dd/mm/yy" class="w-full" />
                     </div>
                     <div v-if="status === 'read'" class="flex flex-col gap-2">
                         <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Término da Leitura</label>
-                        <DatePicker v-model="finished_reading_at" dateFormat="dd/mm/yy" class="w-full"/>
+                        <DatePicker v-model="finished_at" dateFormat="dd/mm/yy" class="w-full" />
                     </div>
                 </div>
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Resenha/Comentário</label>
-                    <Textarea v-model="review" class="w-full bg-gray-50 dark:bg-gray-800 dark:text-gray-400" rows="2" cols="30" />
+                    <Textarea v-model="review" class="w-full bg-gray-50 dark:bg-gray-800 dark:text-gray-400" rows="2"
+                        cols="30" />
                 </div>
                 <div class="mt-4 text-center">
                     <Button :label="buttonLabel" icon="pi pi-check" severity="success" @click="saveBook" />
@@ -217,12 +246,14 @@ const buttonLabel = computed(() => props.bookToEdit ? 'Atualizar Livro' : 'Adici
 
 <style>
 .book-search-dropdown {
-    max-width: 350px !important; /* Ajuste o tamanho que achar melhor */
-    width: 100%; /* Garante que tente ocupar o espaço disponível até o max */
+    max-width: 350px !important;
+    /* Ajuste o tamanho que achar melhor */
+    width: 100%;
+    /* Garante que tente ocupar o espaço disponível até o max */
 }
 
 .book-search-dropdown .p-autocomplete-item {
-    white-space: normal !important; 
+    white-space: normal !important;
     line-height: 1.4;
     padding: 10px;
     border-bottom: 1px solid #f0f0f0;

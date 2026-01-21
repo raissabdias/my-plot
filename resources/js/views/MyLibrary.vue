@@ -17,6 +17,7 @@ import Dialog from 'primevue/dialog';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useConfirm } from "primevue/useconfirm";
 import Paginator from 'primevue/paginator';
+import Button from 'primevue/button';
 
 import { useToast } from 'primevue/usetoast';
 
@@ -37,7 +38,7 @@ const fetchBooks = async () => {
             per_page: rowsPerPage.value 
         }
 
-        const response = await BookService.getAll(params);
+        const response = await BookService.getMyShelf(params);
         books.value = response.data.data;
         totalRecords.value = response.data.total;
     } catch (error) {
@@ -93,7 +94,7 @@ const confirmDelete = (book) => {
         accept: async () => {
 
             try {
-                await BookService.delete(book.id);
+                await BookService.removeFromShelf(book.id);
                 toast.add({severity:'success', summary: 'Sucesso', detail: 'Livro excluído com sucesso.', life: 3000});
                 fetchBooks();
             } catch (error) {
@@ -161,6 +162,7 @@ const onPageChange = (event) => {
                     </span>
                 </span>
                 <SelectButton v-model="filters.status" :options="statusOptions" optionLabel="label" optionValue="value" aria-labelledby="basic" class="w-full md:w-auto" />
+                <Button label="Novo Livro" icon="pi pi-plus" severity="primary" raised @click="openCreateModal" />
                 <IconField iconPosition="left" class="w-full md:w-64">
                     <InputIcon class="pi pi-search"> </InputIcon>
                     <InputText v-model="filters.search" placeholder="Buscar na estante..." class="w-full" />

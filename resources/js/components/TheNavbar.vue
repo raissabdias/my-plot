@@ -1,15 +1,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 import AuthService from '../services/AuthService';
 
-import Button from 'primevue/button';
-
 import logoDark from '../assets/logo_black.png';
 import logoLight from '../assets/logo_white.png';
-
-const emit = defineEmits(['open-modal']);
 
 const router = useRouter();
 const user = ref({});
@@ -30,6 +26,7 @@ const loadUserFromStorage = () => {
 };
 
 onMounted(() => {
+    const token = localStorage.getItem('user_token');
     loadUserFromStorage();
     window.addEventListener('user-updated', loadUserFromStorage);
 });
