@@ -35,7 +35,7 @@ const fetchBooks = async () => {
     try {
         const params = {
             ...filters.value,
-            per_page: rowsPerPage.value 
+            per_page: rowsPerPage.value
         }
 
         const response = await BookService.getMyShelf(params);
@@ -95,11 +95,11 @@ const confirmDelete = (book) => {
 
             try {
                 await BookService.removeFromShelf(book.id);
-                toast.add({severity:'success', summary: 'Sucesso', detail: 'Livro excluído com sucesso.', life: 3000});
+                toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Livro excluído com sucesso.', life: 3000 });
                 fetchBooks();
             } catch (error) {
                 console.error("Erro ao excluir", error);
-                toast.add({severity:'error', summary: 'Erro', detail: 'Não foi possível excluir o livro.', life: 3000});
+                toast.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível excluir o livro.', life: 3000 });
             }
         },
     });
@@ -150,27 +150,51 @@ const onPageChange = (event) => {
 
 <template>
     <div class="min-h-screen bg-slate-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
-        <TheNavbar @open-modal="openCreateModal" @logout="handleLogout" />
-        <main class="max-w-7xl mx-auto p-6">
-            <div class="flex flex-col md:flex-row justify-between gap-4 mb-8">
-                <span class="text-sm text-gray-600 dark:text-gray-400 pt-4">
-                    <span v-if="totalRecords > 0">
-                        Total de <strong>{{ totalRecords }}</strong> livro(s) encontrado(s).
-                    </span>
-                    <span v-else>
-                        Nenhum livro encontrado.
-                    </span>
-                </span>
-                <SelectButton v-model="filters.status" :options="statusOptions" optionLabel="label" optionValue="value" aria-labelledby="basic" class="w-full md:w-auto" />
-                <Button label="Novo Livro" icon="pi pi-plus" severity="primary" raised @click="openCreateModal" />
-                <IconField iconPosition="left" class="w-full md:w-64">
-                    <InputIcon class="pi pi-search"> </InputIcon>
-                    <InputText v-model="filters.search" placeholder="Buscar na estante..." class="w-full" />
-                </IconField>
+        <TheNavbar @logout="handleLogout" />
+        <main class="max-w-7xl mx-auto p-4 md:p-6">
+            <div class="flex justify-between items-center gap-4 mb-6">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                        Minha Estante
+                    </h1>
+                </div>
+                <Button @click="openCreateModal" severity="primary" raised class="!p-3 md:!px-4 md:!py-2">
+                    <div class="flex items-center gap-2">
+                        <i class="pi pi-plus"></i>
+                        <span class="hidden md:inline">Novo Livro</span>
+                    </div>
+                </Button>
             </div>
-            <BookList :books="books" :loading="loading" @edit="openEditModal" @delete="confirmDelete" />
-            <div v-if="totalRecords > 0" class="mt-6 flex justify-center">
-                <Paginator :rows="rowsPerPage" :totalRecords="totalRecords" @page="onPageChange" template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink" />
+            <div class="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 mb-6 flex flex-col-reverse md:flex-row gap-3 justify-between items-center">
+                <div class="w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                    <SelectButton v-model="filters.status" :options="statusOptions" optionLabel="label"
+                        optionValue="value" class="whitespace-nowrap min-w-max" />
+                </div>
+                <div class="flex gap-4 items-center w-full md:w-auto">
+                    <span class="hidden md:block text-sm text-gray-500 whitespace-nowrap" v-if="!loading">
+                        <span v-if="totalRecords > 0"><strong>{{ totalRecords }}</strong> livro(s)</span>
+                        <span v-else>Nenhum livro</span>
+                    </span>
+                    <IconField iconPosition="left" class="w-full md:w-64">
+                        <InputIcon class="pi pi-search" />
+                        <InputText v-model="filters.search" placeholder="Buscar..." class="w-full" />
+                    </IconField>
+                </div>
+            </div>
+            <div v-if="loading" class="flex justify-center py-20">
+                <ProgressSpinner strokeWidth="4" />
+            </div>
+            <div v-else>
+                <BookList :books="books" :loading="loading" @edit="openEditModal" @delete="confirmDelete" />
+                <div v-if="totalRecords > 0" class="mt-6 flex justify-center">
+                    <Paginator :rows="rowsPerPage" :totalRecords="totalRecords" @page="onPageChange"
+                        template="PrevPageLink PageLinks NextPageLink" class="!bg-transparent !border-0" />
+                </div>
+                <div v-if="totalRecords === 0 && !filters.search && !filters.status"
+                    class="text-center py-10 text-gray-500">
+                    <i class="pi pi-folder-open text-4xl mb-3 block"></i>
+                    <p>Sua estante está vazia. Adicione seu primeiro livro!</p>
+                </div>
             </div>
         </main>
         <Dialog v-model:visible="isModalVisible" modal :header="selectedBook ? 'Editar Livro' : 'Adicionar Novo Livro'"
@@ -183,9 +207,4 @@ const onPageChange = (event) => {
         </Dialog>
         <ConfirmDialog class="max-w-md" />
     </div>
-    <button @click="openCreateModal"
-        class="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center text-2xl z-50 md:hidden transition-transform active:scale-90"
-        aria-label="Adicionar Livro">
-        <i class="pi pi-plus"></i>
-    </button>
 </template>

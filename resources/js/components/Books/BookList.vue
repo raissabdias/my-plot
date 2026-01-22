@@ -67,7 +67,7 @@ const getStatusColor = (color) => {
             <div class="relative w-full aspect-[2/3] bg-gray-100 dark:bg-gray-700">
                 <img v-if="book.image_url" :src="book.image_url"
                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    alt="Capa do livro" />
+                    alt="Capa do livro" loading="lazy" />
                 <div v-else
                     class="w-full h-full flex flex-col items-center justify-center text-gray-400 p-4 text-center">
                     <i class="pi pi-image text-4xl mb-2"></i>
