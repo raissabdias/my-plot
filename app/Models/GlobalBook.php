@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use App\Enums\BookStatus;
 
 class GlobalBook extends Model
 {
@@ -27,12 +30,29 @@ class GlobalBook extends Model
     ];
 
     /**
-     * The users that have this global book in their collection
+     * Scope a query to only include read books
      */
-    public function users()
+    #[Scope]
+    protected function read(Builder $query): void
     {
-        return $this->belongsToMany(User::class, 'book_user')
-                    ->withPivot('status', 'review', 'rating', 'started_at', 'finished_at')
-                    ->withTimestamps();
+        $query->where('book_user.status', BookStatus::READ->value);
+    }
+
+    /**
+     * Scope a query to only include reading books
+     */
+    #[Scope]
+    protected function reading(Builder $query): void
+    {
+        $query->where('book_user.status', BookStatus::READING->value);
+    }
+
+    /**
+     * Scope a query to only include planning to read books
+     */
+    #[Scope]
+    protected function planning(Builder $query): void
+    {
+        $query->where('book_user.status', BookStatus::PLANNING->value);
     }
 }
