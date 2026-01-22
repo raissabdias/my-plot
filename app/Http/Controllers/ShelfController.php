@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\GlobalBook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\ShelfStoreRequest;
+use App\Http\Requests\ShelfUpdateRequest;
 
 class ShelfController extends Controller
 {
@@ -60,75 +62,48 @@ class ShelfController extends Controller
     /**
      * Store a book in the user's shelf
      */
-    public function store(Request $request)
+    public function store(ShelfStoreRequest $request)
     {
-        # TODO: refactor validation to a FormRequest
-        $validated = $request->validate([
-            'google_book_id' => 'required|string',
-            'title' => 'required|string',
-            'authors' => 'nullable',
-            'isbn' => 'nullable|string',
-            'image_url' => 'nullable|string',
-            'page_count' => 'nullable|integer',
-            'status' => 'required|string',
-            'rating' => 'nullable|integer',
-            'review' => 'nullable|string',
-            'started_at' => 'nullable|date',
-            'finished_at' => 'nullable|date',
+        $data = $request->validated();
+        $user = $request->user();
+
+        $book = GlobalBook::firstOrCreate(
+            ['google_book_id' => $data['google_book_id']],
+            [
+                'title' => $data['title'],
+                'authors' => $data['authors'],
+                'isbn' => $data['isbn'] ?? null,
+                'cover_url' => $data['image_url'] ?? null,
+                'page_count' => $data['page_count'] ?? 0,
+            ]
+        );
+
+        $user->bookshelf()->syncWithoutDetaching([
+            $book->id => [
+                'status'      => $data['status'],
+                'rating'      => $data['rating'] ?? null,
+                'review'      => $data['review'] ?? null,
+                'started_at'  => $data['started_reading_at'] ?? null,
+                'finished_at' => $data['finished_reading_at'] ?? null,
+            ]
         ]);
 
-        return DB::transaction(function () use ($request) {
-
-            # Try to find the book in the global_books table
-            $book = GlobalBook::firstOrCreate(
-                ['google_book_id' => $request->google_book_id],
-                [
-                    'title' => $request->title,
-                    'authors' => $request->authors,
-                    'isbn' => $request->isbn,
-                    'cover_url' => $request->image_url,
-                    'page_count' => $request->page_count ?? 0,
-                ]
-            );
-
-            # Attach the book to the user's bookshelf with pivot data
-            $request->user()->bookshelf()->syncWithoutDetaching([
-                $book->id => [
-                    'status' => $request->status,
-                    'rating' => $request->rating,
-                    'review' => $request->review,
-                    'started_at'  => $request->started_at,
-                    'finished_at' => $request->finished_at,
-                ]
-            ]);
-
-            return response()->json([
-                'message' => 'Livro adicionado à estante global!',
-                'book' => $book
-            ], 201);
-        });
+        return response()->json(['message' => 'Livro adicionado à estante!'], 201);
     }
 
     /**
      * Update the specified book in the user's shelf
      */
-    public function update(Request $request, $id)
+    public function update(ShelfUpdateRequest $request, $id)
     {
-        # TODO: refactor validation to a FormRequest
-        $validated = $request->validate([
-            'status' => 'required|string',
-            'rating' => 'nullable|integer',
-            'review' => 'nullable|string',
-            'started_at' => 'nullable|date',
-            'finished_at' => 'nullable|date',
-        ]);
+        $data = $request->validated();
 
         $request->user()->bookshelf()->updateExistingPivot($id, [
-            'status' => $request->status,
-            'rating' => $request->rating,
-            'review' => $request->review,
-            'started_at' => $request->started_at,
-            'finished_at' => $request->finished_at,
+            'status'      => $data['status'],
+            'rating'      => $data['rating'] ?? null,
+            'review'      => $data['review'] ?? null,
+            'started_at'  => $data['started_reading_at'] ?? null,
+            'finished_at' => $data['finished_reading_at'] ?? null,
         ]);
 
         return response()->json(['message' => 'Leitura atualizada com sucesso!']);
