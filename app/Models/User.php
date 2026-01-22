@@ -48,6 +48,14 @@ class User extends Authenticatable
     }
 
     /**
+     * One user has many reading goals
+     */
+    public function readingGoals()
+    {
+        return $this->hasMany(ReadingGoal::class);
+    }
+
+    /**
      * Current year reading goal
      */
     public function currentYearGoal()

@@ -30,6 +30,16 @@ class GlobalBook extends Model
     ];
 
     /**
+     * The users that have this global book in their collection
+     */
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'book_user')
+                    ->withPivot('status', 'review', 'rating', 'started_at', 'finished_at')
+                    ->withTimestamps();
+    }
+    
+    /**
      * Scope a query to only include read books
      */
     #[Scope]

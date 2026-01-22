@@ -15,6 +15,12 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        # Delete old avatar if exists
+        if ($user->avatar) {
+            $oldPath = str_replace(Storage::disk('cloudinary')->url(''), '', $user->avatar);
+            Storage::disk('cloudinary')->delete($oldPath);
+        }
+
         $path = $request->file('avatar')->store('avatars', 'cloudinary');
         $url = Storage::disk('cloudinary')->url($path);
 
