@@ -98,17 +98,13 @@ class ShelfController extends Controller
     {
         $data = $request->validated();
 
-        $updated = $request->user()->bookshelf()->updateExistingPivot($id, [
+        $request->user()->bookshelf()->updateExistingPivot($id, [
             'status'      => $data['status'],
             'rating'      => $data['rating'] ?? null,
             'review'      => $data['review'] ?? null,
             'started_at'  => $data['started_reading_at'] ?? null,
             'finished_at' => $data['finished_reading_at'] ?? null,
         ]);
-
-        if (!$updated) {
-            return response()->json(['message' => 'Livro não encontrado na sua estante.'], 404);
-        }
 
         return response()->json(['message' => 'Leitura atualizada com sucesso!']);
     }

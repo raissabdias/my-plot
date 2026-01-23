@@ -5,13 +5,15 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Enums\BookStatus;
+use Illuminate\Support\Facades\Log;
 
 class ShelfUpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        # TODO: Verificar se o usuário tem permissão para atualizar este livro na estante
-        return true; 
+        $bookId = $this->route('shelf');
+        
+        return $this->user()->bookshelf()->where('global_book_id', $bookId)->exists();
     }
 
     public function rules(): array
