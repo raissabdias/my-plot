@@ -45,7 +45,18 @@
 
 ## Screenshots
 
-*(Espaço reservado para você colocar prints da tela depois. Sugestão: Tire prints da Dashboard, da Library e do Modal de Adição)*
+<div align="center">
+  <img src="public/screenshots/dashboard.png" alt="Dashboard do My Plot" width="800">
+  <p><em>Visão geral do progresso e metas de leitura</em></p>
+  
+  <br>
+
+  <div style="display: flex; justify-content: center; gap: 20px;">
+    <img src="public/screenshots/estante.png" alt="Minha Estante" width="45%">
+    <img src="public/screenshots/adicao.png" alt="Adicionando Livro" width="45%">
+  </div>
+  <p><em>Gerenciamento da Estante e Integração com Google Books</em></p>
+</div>
 
 ---
 
