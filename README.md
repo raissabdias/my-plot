@@ -53,7 +53,6 @@
 
   <div style="display: flex; justify-content: center; gap: 20px;">
     <img src="public/screenshots/estante.png" alt="Minha Estante" width="45%">
-    <img src="public/screenshots/adicao.png" alt="Adicionando Livro" width="45%">
   </div>
   <p><em>Gerenciamento da Estante e Integração com Google Books</em></p>
 </div>
