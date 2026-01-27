@@ -48,7 +48,7 @@ export default {
 
     /**
      * Obter detalhes de um livro
-     * @param {number} id 
+     * @param {string} id 
      * @returns 
      */
     getBookDetails(id) {
