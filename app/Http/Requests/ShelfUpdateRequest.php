@@ -22,8 +22,8 @@ class ShelfUpdateRequest extends FormRequest
             'status' => ['required', Rule::enum(BookStatus::class)],
             'rating' => 'nullable|integer|min:0|max:5',
             'review' => 'nullable|string|max:2000',
-            'started_reading_at'  => 'nullable|date',
-            'finished_reading_at' => 'nullable|date|after_or_equal:started_reading_at',
+            'started_at'  => 'nullable|date',
+            'finished_at' => 'nullable|date|after_or_equal:started_at',
         ];
     }
 }

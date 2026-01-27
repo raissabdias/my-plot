@@ -102,8 +102,8 @@ class ShelfController extends Controller
             'status'      => $data['status'],
             'rating'      => $data['rating'] ?? null,
             'review'      => $data['review'] ?? null,
-            'started_at'  => $data['started_reading_at'] ?? null,
-            'finished_at' => $data['finished_reading_at'] ?? null,
+            'started_at'  => $data['started_at'] ?? null,
+            'finished_at' => $data['finished_at'] ?? null,
         ]);
 
         return response()->json(['message' => 'Leitura atualizada com sucesso!']);
