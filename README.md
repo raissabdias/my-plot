@@ -48,12 +48,8 @@
 <div align="center">
   <img src="public/screenshots/dashboard.png" alt="Dashboard do My Plot" width="800">
   <p><em>Visão geral do progresso e metas de leitura</em></p>
-  
   <br>
-
-  <div style="display: flex; justify-content: center; gap: 20px;">
-    <img src="public/screenshots/estante.png" alt="Minha Estante" width="45%">
-  </div>
+  <img src="public/screenshots/estante.png" alt="Minha Estante" width="100%">
   <p><em>Gerenciamento da Estante e Integração com Google Books</em></p>
 </div>
 
