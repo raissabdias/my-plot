@@ -21,4 +21,18 @@ class BookController extends Controller
 
         return response()->json($results);
     }
+
+    /**
+     * Get detailed information about a book by its Google Book ID (GET /api/book/{id})
+     */
+    public function show($id, GoogleBooksService $googleBooksService)
+    {
+        $bookDetails = $googleBooksService->getBookDetails($id);
+
+        if (!$bookDetails) {
+            return response()->json(['error' => 'Book not found'], 404);
+        }
+
+        return response()->json($bookDetails);
+    }
 }

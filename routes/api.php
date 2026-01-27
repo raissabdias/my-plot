@@ -22,5 +22,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
 
     Route::apiResource('shelf', ShelfController::class);
+
+    Route::get('/book/{id}', [BookController::class, 'show']);
 });
 

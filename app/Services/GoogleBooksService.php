@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 class GoogleBooksService
 {
     /**
-     * Search for books using the Google Books API.
+     * Search for books using the Google Books API
      */
     public function search(string $query): array
     {
@@ -38,5 +38,44 @@ class GoogleBooksService
                     : null,
             ];
         })->toArray();
+    }
+
+    /**
+     * Get detailed information about a book by its Google Book ID
+     */
+    public function getBookDetails(string $googleBookId): ?array
+    {
+        $response = Http::get("https://www.googleapis.com/books/v1/volumes/{$googleBookId}");
+
+        if ($response->failed()) {
+            return null;
+        }
+
+        $data = $response->json();
+
+        if (empty($data['volumeInfo'])) {
+            return null;
+        }
+
+        $info = $data['volumeInfo'];
+        $isbn = $info['industryIdentifiers'][0]['identifier'] ?? null;
+
+        # Format the results
+        return [
+            'id' => $data['id'],
+            'title' => $info['title'] ?? 'Sem Título',
+            'authors' => $info['authors'] ?? ['Desconhecido'],
+            'description' => $info['description'] ?? '',
+            'publisher' => $info['publisher'] ?? '',
+            'published_date' => $info['publishedDate'] ?? '',
+            'page_count' => $info['pageCount'] ?? null,
+            'categories' => $info['categories'] ?? [],
+            'average_rating' => $info['averageRating'] ?? null,
+            'ratings_count' => $info['ratingsCount'] ?? null,
+            'isbn' => $isbn,
+            'image_url' => isset($info['imageLinks']['thumbnail']) 
+                ? str_replace('http://', 'https://', $info['imageLinks']['thumbnail']) 
+                : null,
+        ];
     }
 }

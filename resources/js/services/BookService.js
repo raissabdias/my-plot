@@ -44,5 +44,14 @@ export default {
      */
     removeFromShelf(id) {
         return http.delete(`/shelf/${id}`);
-    }
+    },
+
+    /**
+     * Obter detalhes de um livro
+     * @param {number} id 
+     * @returns 
+     */
+    getBookDetails(id) {
+        return http.get(`/book/${id}`);
+    },
 };
