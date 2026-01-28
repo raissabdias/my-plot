@@ -60,107 +60,114 @@ onMounted(() => {
         <TheNavbar />
         <main class="max-w-5xl mx-auto p-4 md:p-8">
             <div v-if="loading"
-                class="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-10 shadow-sm border border-gray-100 dark:border-gray-700">
-                <div class="flex flex-col md:flex-row gap-8 md:gap-12">
+                class="bg-white dark:bg-gray-800 rounded-2xl p-5 md:p-10 shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="flex flex-col md:flex-row gap-6 md:gap-12">
                     <div class="w-full md:w-1/4 flex flex-col items-center">
-                        <Skeleton width="100%" height="300px" borderRadius="12px" />
+                        <Skeleton width="160px" height="240px" borderRadius="12px" class="md:w-full md:h-[300px]" />
                     </div>
                     <div class="flex-1 flex flex-col gap-4">
                         <div class="flex justify-between items-start gap-4">
-                            <Skeleton width="70%" height="2.5rem" />
-                            <Skeleton width="5rem" height="2rem" borderRadius="6px" />
+                            <Skeleton width="70%" height="2rem" />
+                            <Skeleton width="4rem" height="2rem" borderRadius="6px" />
                         </div>
                         <Skeleton width="40%" height="1.5rem" />
                         <Skeleton width="20%" height="1rem" class="mt-2" />
                         <div class="mt-6 grid grid-cols-2 gap-6">
-                            <div>
-                                <Skeleton width="50%" height="0.8rem" class="mb-2" />
-                                <Skeleton width="80%" height="1.2rem" />
-                            </div>
-                            <div>
-                                <Skeleton width="50%" height="0.8rem" class="mb-2" />
-                                <Skeleton width="80%" height="1.2rem" />
-                            </div>
-                            <div>
-                                <Skeleton width="50%" height="0.8rem" class="mb-2" />
-                                <Skeleton width="80%" height="1.2rem" />
-                            </div>
+                            <Skeleton width="100%" height="3rem" />
+                            <Skeleton width="100%" height="3rem" />
+                            <Skeleton width="100%" height="3rem" />
                         </div>
                     </div>
                 </div>
             </div>
             <div v-else-if="book"
                 class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="p-6 md:p-10">
-                    <div class="flex flex-col md:flex-row gap-8 md:gap-12">
-                        <div class="w-full md:w-1/4 flex flex-col items-center">
+                <div class="p-5 md:p-10">
+                    <div class="flex flex-col md:flex-row gap-6 md:gap-12">
+                        <div class="w-full md:w-1/4 flex flex-col items-center shrink-0">
                             <div
-                                class="relative w-48 md:w-full max-w-[200px] aspect-[2/3] shadow-2xl rounded-lg overflow-hidden group">
+                                class="relative w-40 md:w-full max-w-[220px] aspect-[2/3] shadow-lg md:shadow-2xl rounded-lg overflow-hidden group">
                                 <img v-if="book.image_url" :src="getCleanCoverUrl(book.image_url)" :alt="book.title"
                                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                                 <div v-else
                                     class="w-full h-full bg-gray-200 dark:bg-gray-700 flex flex-col items-center justify-center text-gray-400">
-                                    <i class="pi pi-image text-4xl mb-2"></i>
-                                    <span>Sem Capa</span>
+                                    <i class="pi pi-image text-3xl md:text-4xl mb-2"></i>
+                                    <span class="text-xs">Sem Capa</span>
                                 </div>
                             </div>
                         </div>
                         <div class="flex-1 text-left">
-                            <div class="flex justify-between items-start gap-4 mb-2">
+                            <div class="flex justify-between items-start gap-3 mb-2">
                                 <h2
-                                    class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight flex-1">
+                                    class="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight flex-1">
                                     {{ book.title }}
                                 </h2>
                                 <Button label="Voltar" icon="pi pi-arrow-left" text @click="goBack"
-                                    class="shrink-0 !px-2 md:!px-3 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300" />
+                                    class="shrink-0 !px-2 md:!px-3 !py-1 md:!py-2 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 text-sm md:text-base" />
                             </div>
-                            <p class="text-xl text-gray-600 dark:text-gray-300 mb-4">
+                            <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-3 md:mb-4">
                                 de <span class="font-semibold text-indigo-600 dark:text-indigo-400">{{
                                     book.authors?.join(', ') || 'Desconhecido' }}</span>
                             </p>
                             <div class="flex items-center gap-3 mb-6" v-if="book.average_rating">
                                 <Rating :modelValue="book.average_rating" readonly :cancel="false" />
-                                <span class="text-sm text-gray-500 dark:text-gray-400">
-                                    ({{ book.ratings_count || 0 }} avaliações Google)
+                                <span class="text-xs md:text-sm text-gray-500 dark:text-gray-400">
+                                    ({{ book.ratings_count || 0 }})
                                 </span>
                             </div>
-                            <Divider class="my-6" />
-                            <div class="grid grid-cols-2 md:grid-cols-2 gap-y-6 gap-x-4 text-sm mb-6">
+                            <Divider class="my-5 md:my-6" />
+                            <div class="grid grid-cols-2 gap-y-4 md:gap-y-6 gap-x-4 text-sm mb-2">
                                 <div>
-                                    <span class="block text-gray-400 uppercase text-xs font-bold mb-1">Editora</span>
-                                    <span class="text-gray-800 dark:text-white font-medium text-lg">{{ book.publisher ||  '-' }}</span>
+                                    <span
+                                        class="block text-gray-400 uppercase text-[10px] md:text-xs font-bold mb-1">Editora</span>
+                                    <span
+                                        class="text-gray-800 dark:text-white font-medium text-base md:text-lg block truncate"
+                                        :title="book.publisher">
+                                        {{ book.publisher || '-' }}
+                                    </span>
                                 </div>
                                 <div>
-                                    <span class="block text-gray-400 uppercase text-xs font-bold mb-1">Publicação</span>
-                                    <span class="text-gray-800 dark:text-white font-medium text-lg">{{formatDate(book.published_date) || '-' }}</span>
+                                    <span
+                                        class="block text-gray-400 uppercase text-[10px] md:text-xs font-bold mb-1">Publicação</span>
+                                    <span class="text-gray-800 dark:text-white font-medium text-base md:text-lg">
+                                        {{ formatDate(book.published_date) || '-' }}
+                                    </span>
                                 </div>
                                 <div>
-                                    <span class="block text-gray-400 uppercase text-xs font-bold mb-1">Páginas</span>
-                                    <span class="text-gray-800 dark:text-white font-medium text-lg">{{ book.page_count || '-' }}</span>
+                                    <span
+                                        class="block text-gray-400 uppercase text-[10px] md:text-xs font-bold mb-1">Páginas</span>
+                                    <span class="text-gray-800 dark:text-white font-medium text-base md:text-lg">
+                                        {{ book.page_count || '-' }}
+                                    </span>
                                 </div>
                                 <div v-if="book.isbn">
-                                    <span class="block text-gray-400 uppercase text-xs font-bold mb-1">ISBN</span>
-                                    <span class="text-gray-800 dark:text-white font-mono">{{ book.isbn }}</span>
+                                    <span
+                                        class="block text-gray-400 uppercase text-[10px] md:text-xs font-bold mb-1">ISBN</span>
+                                    <span class="text-gray-800 dark:text-white font-mono text-sm md:text-base">
+                                        {{ book.isbn }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 dark:bg-gray-800/50 p-6 md:p-10 border-t border-gray-100 dark:border-gray-700">
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <div class="bg-gray-50 dark:bg-gray-800/50 p-5 md:p-10 border-t border-gray-100 dark:border-gray-700">
+                    <h3
+                        class="text-lg md:text-xl font-bold text-gray-800 dark:text-white mb-3 md:mb-4 flex items-center gap-2">
                         <i class="pi pi-align-left text-indigo-500"></i> Sinopse
                     </h3>
                     <div v-if="book.description"
-                        class="text-gray-600 dark:text-gray-300 leading-relaxed text-lg description-content"
+                        class="text-gray-600 dark:text-gray-300 leading-relaxed text-base md:text-lg description-content"
                         v-html="book.description">
                     </div>
                     <p v-else class="text-gray-400 italic">Nenhuma descrição disponível para este livro.</p>
                 </div>
-                <div class="bg-gray-50 dark:bg-gray-800/50 p-6 md:p-10 border-t border-gray-100 dark:border-gray-700">
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <div class="bg-gray-50 dark:bg-gray-800/50 p-5 md:p-10 border-t border-gray-100 dark:border-gray-700">
+                    <h3
+                        class="text-lg md:text-xl font-bold text-gray-800 dark:text-white mb-3 md:mb-4 flex items-center gap-2">
                         <i class="pi pi-bookmark text-indigo-500"></i> Categorias
                     </h3>
-                    <div v-if="book.categories" class="flex flex-wrap gap-2 justify-center md:justify-start mb-3">
+                    <div v-if="book.categories" class="flex flex-wrap gap-2 justify-start mb-1">
                         <Tag v-for="cat in book.categories" :key="cat" :value="cat" severity="secondary"
                             class="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300" />
                     </div>
