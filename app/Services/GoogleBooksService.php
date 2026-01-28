@@ -4,8 +4,17 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 
+use function Illuminate\Log\log;
+
 class GoogleBooksService
 {
+    protected $apiKey;
+    
+    public function __construct()
+    {
+        $this->apiKey = env('GOOGLE_BOOKS_API_KEY');
+    }
+
     /**
      * Search for books using the Google Books API
      */
@@ -13,7 +22,8 @@ class GoogleBooksService
     {
         $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
             'q' => $query,
-            'maxResults' => 10
+            'maxResults' => 10,
+            'key' => $this->apiKey
         ]);
 
         $data = $response->json();
@@ -45,7 +55,9 @@ class GoogleBooksService
      */
     public function getBookDetails(string $googleBookId): ?array
     {
-        $response = Http::get("https://www.googleapis.com/books/v1/volumes/{$googleBookId}");
+        $response = Http::get("https://www.googleapis.com/books/v1/volumes/{$googleBookId}", [
+            'key' => $this->apiKey
+        ]);
 
         if ($response->failed()) {
             return null;
