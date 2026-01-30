@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 
@@ -66,6 +66,12 @@ onMounted(() => {
     const bookId = route.params.id;
     if (bookId) {
         fetchBookDetails(bookId);
+    }
+});
+
+watch(() => route.params.id, (newId) => {
+    if (newId) {
+        fetchBookDetails(newId);
     }
 });
 

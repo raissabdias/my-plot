@@ -36,11 +36,13 @@ class BookController extends Controller
 
         # Check if the book is in the user's collection
         $userStatus = null;
-        $globalBook = GlobalBook::where('google_book_id', $id)->first();
-        if ($globalBook) {
-            $userBook = $request->user()->bookshelf()->where('global_book_id', $globalBook->id)->first();
-            if ($userBook) {
-                $userStatus = $userBook->pivot->status_formatted;
+        if ($request->user()) {
+            $globalBook = GlobalBook::where('google_book_id', $id)->first();
+            if ($globalBook && $request->user()) {
+                $userBook = $request->user()->bookshelf()->where('global_book_id', $globalBook->id)->first();
+                if ($userBook) {
+                    $userStatus = $userBook->pivot->status_formatted;
+                }
             }
         }
 
