@@ -50,8 +50,10 @@ const handleRegister = async () => {
     <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
         <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 dark:border-gray-700">
             <div class="text-center mb-8">
-                <img :src="logoDark" alt="My Plot Logo" class="h-16 mx-auto mb-4 block dark:hidden" />
-                <img :src="logoLight" alt="My Plot Logo" class="h-16 mx-auto mb-4 hidden dark:block" />
+                <router-link to="/">
+                    <img :src="logoDark" alt="My Plot Logo" class="h-16 mx-auto mb-4 block dark:hidden" />
+                    <img :src="logoLight" alt="My Plot Logo" class="h-16 mx-auto mb-4 hidden dark:block" />
+                </router-link>
                 <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Complete seu cadastro e comece a cadastrar sua estante</p>
             </div>
             <form @submit.prevent="handleRegister" class="flex flex-col gap-5">

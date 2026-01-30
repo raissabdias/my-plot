@@ -14,11 +14,12 @@ class BookController extends Controller
     public function search(Request $request, GoogleBooksService $googleBooksService)
     {
         $query = $request->query('query');
+        $lang = $request->query('langRestrict');
         if (!$query) {
             return response()->json(['error' => 'Query param is required'], 400);
         }
 
-        $results = $googleBooksService->search($query);
+        $results = $googleBooksService->search($query, $lang);
 
         return response()->json($results);
     }

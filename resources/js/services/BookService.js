@@ -54,4 +54,12 @@ export default {
     getBookDetails(id) {
         return http.get(`/book/${id}`);
     },
+
+    /**
+     * Listar livros em alta
+     * @returns 
+     */
+    getTrending() {
+        return http.get(`/books/search?q=subject:literatura&langRestrict=pt`);
+    }
 };

@@ -54,7 +54,7 @@ const getCleanCoverUrl = (url) => {
 
 const handleLogout = async () => {
     await AuthService.logout();
-    router.push('/login');
+    router.push('/');
 };
 
 const loadUserFromStorage = () => {
@@ -203,8 +203,12 @@ const closeMenu = () => {
                     </button>
                 </div>
                 <div v-else class="mt-3 px-3">
+                    <router-link to="/register" @click="closeMenu"
+                        class="block text-center w-full bg-emerald-600 text-white px-4 py-2 rounded-md font-medium">
+                        Cadastrar
+                    </router-link>
                     <router-link to="/login" @click="closeMenu"
-                        class="block text-center w-full bg-indigo-600 text-white px-4 py-2 rounded-md font-medium">
+                        class="block text-center w-full bg-indigo-600 text-white px-4 py-2 mt-3 rounded-md font-medium">
                         Entrar
                     </router-link>
                 </div>

@@ -19,14 +19,17 @@ class GoogleBooksService
     /**
      * Search for books using the Google Books API
      */
-    public function search(string $query): array
+    public function search(string $query, $lang = null): array
     {
         # Cache results for 1 hour
-        return Cache::remember("search_{$query}", 3600, function () use ($query) {
+        return Cache::remember("search_{$query}", 3600, function () use ($query, $lang) {
             $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
                 'q' => $query,
                 'maxResults' => 10,
-                'key' => $this->apiKey
+                'key' => $this->apiKey,
+                'langRestrict' => $lang,
+                'printType' => 'books',
+                'orderBy' => 'relevance',
             ]);
 
             $data = $response->json();
