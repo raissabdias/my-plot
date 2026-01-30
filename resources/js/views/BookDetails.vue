@@ -18,6 +18,7 @@ const toast = useToast();
 const book = ref(null);
 const loading = ref(true);
 const isLoading = ref(false);
+const user = ref({});
 
 const fetchBookDetails = async (id) => {
     loading.value = true;
@@ -66,6 +67,11 @@ onMounted(() => {
     const bookId = route.params.id;
     if (bookId) {
         fetchBookDetails(bookId);
+    }
+
+    const userData = localStorage.getItem('user_data');
+    if (userData) {
+        user.value = JSON.parse(userData);
     }
 });
 
@@ -170,7 +176,7 @@ const addToBookshelf = async () => {
                                     class="!bg-gray-100 dark:!bg-gray-700 !text-gray-500 dark:!text-gray-400 border border-gray-200 dark:border-gray-600 !font-normal"
                                     rounded />
                             </div>
-                            <div class="mb-6 flex justify-center md:justify-start">
+                            <div v-if="user.id" class="mb-6 flex justify-center md:justify-start">
                                 <div v-if="book.user_status">
                                     <Tag :value="book.user_status.label" :icon="book.user_status.icon"
                                         :class="getStatusColor(book.user_status.color)"
