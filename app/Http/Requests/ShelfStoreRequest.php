@@ -5,12 +5,28 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Enums\BookStatus;
+use Illuminate\Validation\Rules\Enum;
 
 class ShelfStoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
         return true;
+    }
+
+    /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        # Check if the field is missing or null in the request
+        if (!$this->has('status')) {
+            $this->merge([
+                'status' => BookStatus::PLANNING->value
+            ]);
+        }
     }
 
     public function rules(): array

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('authors')->nullable();
             $table->text('description')->nullable();
-            $table->string('cover_url')->nullable();
+            $table->text('cover_url')->nullable();
             $table->string('isbn')->nullable();
             $table->integer('page_count')->nullable();
             $table->string('published_date')->nullable();

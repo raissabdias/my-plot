@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GlobalBook;
 use App\Services\GoogleBooksService;
 use Illuminate\Http\Request;
 
@@ -25,13 +26,25 @@ class BookController extends Controller
     /**
      * Get detailed information about a book by its Google Book ID (GET /api/book/{id})
      */
-    public function show($id, GoogleBooksService $googleBooksService)
+    public function show($id, Request $request, GoogleBooksService $googleBooksService)
     {
         $bookDetails = $googleBooksService->getBookDetails($id);
 
         if (!$bookDetails) {
             return response()->json(['error' => 'Book not found'], 404);
         }
+
+        # Check if the book is in the user's collection
+        $userStatus = null;
+        $globalBook = GlobalBook::where('google_book_id', $id)->first();
+        if ($globalBook) {
+            $userBook = $request->user()->bookshelf()->where('global_book_id', $globalBook->id)->first();
+            if ($userBook) {
+                $userStatus = $userBook->pivot->status_formatted;
+            }
+        }
+
+        $bookDetails['user_status'] = $userStatus;
 
         return response()->json($bookDetails);
     }

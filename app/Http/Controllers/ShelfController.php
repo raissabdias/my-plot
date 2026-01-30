@@ -88,7 +88,9 @@ class ShelfController extends Controller
             ]
         ]);
 
-        return response()->json(['message' => 'Livro adicionado à estante!'], 201);
+        $book = $user->bookshelf()->where('global_book_id', $book->id)->first()->pivot;
+
+        return response()->json(['message' => 'Livro adicionado à estante!', 'book' => $book], 201);
     }
 
     /**
