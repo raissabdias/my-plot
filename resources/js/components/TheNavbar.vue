@@ -122,7 +122,7 @@ const closeMenu = () => {
                     </div>
                 </div>
                 <div class="hidden md:flex items-center space-x-6 shrink-0">
-                    <router-link to="/library"
+                    <router-link v-if="user.id" to="/library"
                         class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
                         Minha Estante
                     </router-link>
@@ -140,8 +140,9 @@ const closeMenu = () => {
                         </button>
                     </div>
                     <div v-else>
-                        <router-link to="/login"
-                            class="text-indigo-600 font-medium hover:text-indigo-800">Entrar</router-link>
+                        <router-link to="/login" class="text-indigo-600 font-medium hover:text-indigo-800">Entrar</router-link>
+                        <span  class="text-neutral-600"> | </span>
+                        <router-link to="/register" class="text-emerald-600 font-medium hover:text-indigo-800">Cadastrar</router-link>
                     </div>
                 </div>
                 <div class="flex items-center md:hidden">
@@ -186,7 +187,7 @@ const closeMenu = () => {
                         </AutoComplete>
                     </span>
                 </div>
-                <router-link to="/library" @click="closeMenu"
+                <router-link v-if="user.id" to="/library" @click="closeMenu"
                     class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <i class="pi pi-book mr-2"></i> Minha Estante
                 </router-link>
