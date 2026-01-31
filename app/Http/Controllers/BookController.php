@@ -6,8 +6,6 @@ use App\Models\GlobalBook;
 use App\Services\GoogleBooksService;
 use Illuminate\Http\Request;
 
-use function Illuminate\Log\log;
-
 class BookController extends Controller
 {
     /**

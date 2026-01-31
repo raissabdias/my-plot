@@ -25,6 +25,10 @@ const fetchBookDetails = async (id) => {
     try {
         const response = await BookService.getBookDetails(id);
         book.value = response.data;
+
+        if (book.value.title) {
+            document.title = `${book.value.title} | MyPlot`;
+        }
     } catch (error) {
         console.error("Error fetching book:", error);
     } finally {
