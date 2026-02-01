@@ -73,7 +73,7 @@ const goToDetails = (bookId) => {
         </div>
     </div>
     <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
-        <div v-for="book in books" :key="book.id" @click="$emit('edit', book)"
+        <div v-for="book in books" :key="book.id" @click="goToDetails(book.google_book_id)"
             class="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden border border-gray-100 dark:bg-gray-800 dark:border-gray-700 cursor-pointer">
             <div class="relative w-full aspect-[2/3] bg-gray-100 dark:bg-gray-700">
                 <img v-if="book.image_url" :src="getCleanCoverUrl(book.image_url)"
@@ -92,7 +92,7 @@ const goToDetails = (bookId) => {
             </div>
             <div class="p-4 flex flex-col flex-1">
                 <h3 class="font-bold text-gray-800 text-base leading-tight mb-1 line-clamp-2 min-h-[2.5rem] dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                    :title="book.title" @click.stop="goToDetails(book.id)">
+                    :title="book.title" @click.stop="goToDetails(book.google_book_id)">
                     {{ book.title }}
                 </h3>
                 <p class="text-gray-500 text-xs mb-3 truncate">{{ book.author }}</p>
@@ -103,9 +103,9 @@ const goToDetails = (bookId) => {
                             class="!gap-0.5 scale-75 origin-left" />
                     </div>
                     <div class="flex items-center gap-1">
-                        <Button icon="pi pi-eye" text rounded severity="secondary"
-                            class="!w-8 !h-8 text-gray-400 hover:text-indigo-600" @click.stop="goToDetails(book.google_book_id)"
-                            v-tooltip.top="'Ver Detalhes'" />
+                        <Button icon="pi pi-pencil" text rounded severity="secondary"
+                            class="!w-8 !h-8 text-gray-400 hover:text-indigo-600" @click.stop="$emit('edit', book)"
+                            v-tooltip.top="'Editar Leitura'" />
                         <div v-if="book.review"
                             class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors cursor-help"
                             v-tooltip.top="book.review">
