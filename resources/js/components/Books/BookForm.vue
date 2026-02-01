@@ -65,17 +65,29 @@ const resetForm = () => {
     is_public.value = true;
 };
 
-const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { 
-        timeZone: 'UTC' 
-    });
+const toDatabaseDate = (dateObj) => {
+    if (!dateObj) return null;
+    if (!(dateObj instanceof Date) || isNaN(dateObj)) return null;
+    
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+};
+
+const parseDatabaseDate = (dateString) => {
+    if (!dateString) return null;
+    
+    const cleanDate = String(dateString).substring(0, 10);
+    const [year, month, day] = cleanDate.split('-').map(Number);
+    if (!year || !month || !day) return null;
+
+    return new Date(year, month - 1, day);
 };
 
 watch(() => props.bookToEdit, (newBook) => {
     if (newBook) {
-        console.log("Editando livro:", newBook);
         title.value = newBook.title;
         author.value = newBook.author;
         isbn.value = newBook.isbn;
@@ -83,8 +95,8 @@ watch(() => props.bookToEdit, (newBook) => {
         status.value = newBook.status;
         rating.value = newBook.rating || 0;
         review.value = newBook.review;
-        started_at.value = newBook.started_at ? formatDate(newBook.started_at) : null;
-        finished_at.value = newBook.finished_at ? formatDate(newBook.finished_at) : null;
+        started_at.value = newBook.started_at ? parseDatabaseDate(newBook.started_at) : null;
+        finished_at.value = newBook.finished_at ? parseDatabaseDate(newBook.finished_at) : null;
         google_book_id.value = newBook.google_book_id || null;
         is_public.value = newBook.is_public ? true : false;
     } else {
@@ -134,8 +146,8 @@ const saveBook = async () => {
         status: status.value,
         rating: rating.value,
         review: review.value,
-        started_at: started_at.value,
-        finished_at: finished_at.value,
+        started_at: toDatabaseDate(started_at.value),
+        finished_at: toDatabaseDate(finished_at.value),
         is_public: is_public.value
     };
 
