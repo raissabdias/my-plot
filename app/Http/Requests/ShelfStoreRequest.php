@@ -43,6 +43,7 @@ class ShelfStoreRequest extends FormRequest
             'review' => 'nullable|string|max:2000',
             'started_reading_at' => 'nullable|date',
             'finished_reading_at' => 'nullable|date|after_or_equal:started_reading_at',
+            'is_public' => 'nullable|boolean',
         ];
     }
 }

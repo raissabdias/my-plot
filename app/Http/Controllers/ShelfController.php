@@ -53,6 +53,7 @@ class ShelfController extends Controller
                 'started_at' => $book->pivot->started_at,
                 'finished_at' => $book->pivot->finished_at,
                 'status_formatted' => $book->pivot->status_formatted,
+                'is_public' => $book->pivot->is_public,
             ];
         });
 
@@ -80,11 +81,12 @@ class ShelfController extends Controller
 
         $user->bookshelf()->syncWithoutDetaching([
             $book->id => [
-                'status'      => $data['status'],
-                'rating'      => $data['rating'] ?? null,
-                'review'      => $data['review'] ?? null,
-                'started_at'  => $data['started_reading_at'] ?? null,
+                'status' => $data['status'],
+                'rating' => $data['rating'] ?? null,
+                'review' => $data['review'] ?? null,
+                'started_at' => $data['started_reading_at'] ?? null,
                 'finished_at' => $data['finished_reading_at'] ?? null,
+                'is_public' => $data['is_public'] ?? true
             ]
         ]);
 
@@ -101,11 +103,12 @@ class ShelfController extends Controller
         $data = $request->validated();
 
         $request->user()->bookshelf()->updateExistingPivot($id, [
-            'status'      => $data['status'],
-            'rating'      => $data['rating'] ?? null,
-            'review'      => $data['review'] ?? null,
-            'started_at'  => $data['started_at'] ?? null,
+            'status' => $data['status'],
+            'rating' => $data['rating'] ?? null,
+            'review' => $data['review'] ?? null,
+            'started_at' => $data['started_at'] ?? null,
             'finished_at' => $data['finished_at'] ?? null,
+            'is_public' => $data['is_public'] ?? true,
         ]);
 
         return response()->json(['message' => 'Leitura atualizada com sucesso!']);

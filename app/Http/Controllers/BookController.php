@@ -57,7 +57,8 @@ class BookController extends Controller
                 ->wherePivotNotNull('review')
                 ->wherePivot('review', '!=', '')
                 ->wherePivot('status', BookStatus::READ->value)
-                ->withPivot(['review', 'rating', 'updated_at', 'status'])
+                ->wherePivot('is_public', true)
+                ->withPivot(['review', 'rating', 'updated_at', 'status', 'is_public'])
                 ->latest('book_user.updated_at')
                 ->take(10)
                 ->get();

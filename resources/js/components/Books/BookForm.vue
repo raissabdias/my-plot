@@ -8,6 +8,8 @@ import Rating from 'primevue/rating';
 import Dropdown from 'primevue/dropdown';
 import Textarea from 'primevue/textarea';
 import DatePicker from 'primevue/datepicker';
+import Checkbox from 'primevue/checkbox';
+
 import { useToast } from 'primevue/usetoast';
 
 const props = defineProps({
@@ -34,6 +36,7 @@ const rating = ref(0);
 const review = ref('');
 const started_at = ref(null);
 const finished_at = ref(null);
+const is_public = ref(true);
 
 // Busca
 const selectedBookSearch = ref(null);
@@ -59,6 +62,7 @@ const resetForm = () => {
     selectedBookSearch.value = null;
     started_at.value = null;
     finished_at.value = null;
+    is_public.value = true;
 };
 
 const formatDate = (dateString) => {
@@ -71,6 +75,7 @@ const formatDate = (dateString) => {
 
 watch(() => props.bookToEdit, (newBook) => {
     if (newBook) {
+        console.log("Editando livro:", newBook);
         title.value = newBook.title;
         author.value = newBook.author;
         isbn.value = newBook.isbn;
@@ -81,6 +86,7 @@ watch(() => props.bookToEdit, (newBook) => {
         started_at.value = newBook.started_at ? formatDate(newBook.started_at) : null;
         finished_at.value = newBook.finished_at ? formatDate(newBook.finished_at) : null;
         google_book_id.value = newBook.google_book_id || null;
+        is_public.value = newBook.is_public ? true : false;
     } else {
         resetForm();
     }
@@ -129,7 +135,8 @@ const saveBook = async () => {
         rating: rating.value,
         review: review.value,
         started_at: started_at.value,
-        finished_at: finished_at.value
+        finished_at: finished_at.value,
+        is_public: is_public.value
     };
 
     try {
@@ -236,6 +243,12 @@ const buttonLabel = computed(() => {
                     <Textarea v-model="review" class="w-full bg-gray-50 dark:bg-gray-800 dark:text-gray-400" rows="2"
                         cols="30" />
                 </div>
+                <div class="flex items-center gap-2 mt-3">
+                    <Checkbox v-model="is_public" :binary="true" inputId="public-review" />
+                    <label for="public-review" class="text-sm text-gray-600 dark:text-gray-400 cursor-pointer select-none">
+                        Publicar minha resenha na página do livro (apenas após concluir a leitura)
+                    </label>
+                </div>
                 <div class="mt-4 text-center">
                     <Button :label="buttonLabel" icon="pi pi-check" severity="success" @click="saveBook" />
                 </div>
@@ -247,9 +260,7 @@ const buttonLabel = computed(() => {
 <style>
 .book-search-dropdown {
     max-width: 350px !important;
-    /* Ajuste o tamanho que achar melhor */
     width: 100%;
-    /* Garante que tente ocupar o espaço disponível até o max */
 }
 
 .book-search-dropdown .p-autocomplete-item {
