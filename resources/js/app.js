@@ -9,10 +9,6 @@ import ToastService from 'primevue/toastservice';
 import App from './App.vue'; 
 import router from './router';
 
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.documentElement.classList.add('dark');
-}
-
 const app = createApp(App);
 app.use(PrimeVue, {
     theme: {

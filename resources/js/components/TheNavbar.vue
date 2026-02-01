@@ -9,6 +9,7 @@ import logoDark from '../assets/logo_black.png';
 import logoLight from '../assets/logo_white.png';
 
 import AutoComplete from 'primevue/autocomplete';
+import Button from 'primevue/button';
 
 const router = useRouter();
 const user = ref({});
@@ -18,6 +19,34 @@ const isMenuOpen = ref(false);
 const selectedBook = ref(null);
 const filteredBooks = ref([]);
 const loadingSearch = ref(false);
+const isDark = ref(false);
+
+const toggleTheme = () => {
+    isDark.value = !isDark.value;
+    const html = document.documentElement;
+
+    if (isDark.value) {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    }
+};
+
+// Inicializar tema com base na preferência do usuário ou do sistema
+const initTheme = () => {
+    const userTheme = localStorage.getItem('theme');
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (userTheme === 'dark' || (!userTheme && systemDark)) {
+        isDark.value = true;
+        document.documentElement.classList.add('dark');
+    } else {
+        isDark.value = false;
+        document.documentElement.classList.remove('dark');
+    }
+};
 
 const searchBook = async (event) => {
     const query = event.query.trim();
@@ -65,6 +94,7 @@ const loadUserFromStorage = () => {
 };
 
 onMounted(() => {
+    initTheme();
     loadUserFromStorage();
     window.addEventListener('user-updated', loadUserFromStorage);
 });
@@ -122,15 +152,17 @@ const closeMenu = () => {
                     </div>
                 </div>
                 <div class="hidden md:flex items-center space-x-6 shrink-0">
+                    <button @click="toggleTheme"
+                        class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors focus:outline-none"
+                        :title="isDark ? 'Mudar para tema claro' : 'Mudar para tema escuro'">
+                        <i :class="isDark ? 'pi pi-sun text-yellow-500' : 'pi pi-moon'" class="text-xl"></i>
+                    </button>
                     <router-link v-if="user.id" to="/library"
                         class="text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition">
                         Minha Estante
                     </router-link>
                     <div v-if="user.id" class="flex items-center gap-4 ml-2">
                         <router-link to="/profile" class="flex items-center gap-3 hover:opacity-80 transition">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200 max-w-[100px] truncate">
-                                {{ user.name }}
-                            </span>
                             <img :src="user.avatar || defaultAvatar" alt="Avatar"
                                 class="w-9 h-9 rounded-full border-2 border-indigo-100 object-cover">
                         </router-link>
@@ -140,9 +172,11 @@ const closeMenu = () => {
                         </button>
                     </div>
                     <div v-else>
-                        <router-link to="/login" class="text-indigo-600 font-medium hover:text-indigo-800">Entrar</router-link>
-                        <span  class="text-neutral-600"> | </span>
-                        <router-link to="/register" class="text-emerald-600 font-medium hover:text-indigo-800">Cadastrar</router-link>
+                        <router-link to="/login"
+                            class="text-indigo-600 font-medium hover:text-indigo-800">Entrar</router-link>
+                        <span class="text-neutral-600"> | </span>
+                        <router-link to="/register"
+                            class="text-emerald-600 font-medium hover:text-indigo-800">Cadastrar</router-link>
                     </div>
                 </div>
                 <div class="flex items-center md:hidden">
