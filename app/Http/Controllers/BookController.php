@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BookStatus;
 use App\Models\GlobalBook;
 use App\Services\GoogleBooksService;
 use Illuminate\Http\Request;
@@ -35,19 +36,45 @@ class BookController extends Controller
             return response()->json(['error' => 'Book not found'], 404);
         }
 
-        # Check if the book is in the user's collection
         $userStatus = null;
-        if ($request->user('sanctum')) {
-            $globalBook = GlobalBook::where('google_book_id', $id)->first();
-            if ($globalBook) {
-                $userBook = $request->user('sanctum')->bookshelf()->where('global_book_id', $globalBook->id)->first();
-                if ($userBook) {
-                    $userStatus = $userBook->pivot->status_formatted;
-                }
+        
+        $user = $request->user('sanctum');
+        $globalBook = GlobalBook::where('google_book_id', $id)->first();
+
+        # Retrieve user's status for this book if logged in
+        if ($user && $globalBook) {
+            $userBook = $user->bookshelf()->where('global_book_id', $globalBook->id)->first();
+            if ($userBook) {
+                $userStatus = $userBook->pivot->status_formatted;
             }
         }
-
         $bookDetails['user_status'] = $userStatus;
+
+        # Retrieve community reviews for this book
+        $communityReviews = [];
+        if ($globalBook) {
+            $reviews = $globalBook->users()
+                ->wherePivotNotNull('review')
+                ->wherePivot('review', '!=', '')
+                ->wherePivot('status', BookStatus::READ->value)
+                ->withPivot(['review', 'rating', 'updated_at', 'status'])
+                ->latest('book_user.updated_at')
+                ->take(10)
+                ->get();
+
+            $communityReviews = $reviews->map(function ($reviewer) {
+                return [
+                    'id' => $reviewer->id,
+                    'name' => $reviewer->name,
+                    'avatar' => $reviewer->avatar,
+                    'rating' => $reviewer->pivot->rating,
+                    'review' => $reviewer->pivot->review,
+                    'status' => $reviewer->pivot->status,
+                    'date' => $reviewer->pivot->updated_at->diffForHumans(),
+                ];
+            });
+        }
+        $bookDetails['community_reviews'] = $communityReviews;
 
         return response()->json($bookDetails);
     }

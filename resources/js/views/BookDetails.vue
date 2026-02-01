@@ -10,6 +10,7 @@ import Button from 'primevue/button';
 import Rating from 'primevue/rating';
 import Tag from 'primevue/tag';
 import Skeleton from 'primevue/skeleton';
+import Avatar from 'primevue/avatar';
 
 const route = useRoute();
 const router = useRouter();
@@ -208,7 +209,7 @@ const addToBookshelf = async () => {
                             <span
                                 class="text-gray-400 dark:text-gray-400 text-xs uppercase font-bold tracking-wider mb-1">Páginas</span>
                             <span class="font-semibold text-gray-800 dark:text-gray-200">{{ book.page_count || '-'
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="flex flex-col">
                             <span
@@ -226,7 +227,7 @@ const addToBookshelf = async () => {
                             <span
                                 class="text-gray-400 dark:text-gray-400 text-xs uppercase font-bold tracking-wider mb-1">ISBN</span>
                             <span class="font-semibold text-gray-800 dark:text-gray-200 font-mono">{{ book.isbn || '-'
-                            }}</span>
+                                }}</span>
                         </div>
                     </div>
                 </div>
@@ -246,7 +247,50 @@ const addToBookshelf = async () => {
                 <h2 class="text-xl text-gray-600 dark:text-gray-400">Livro não encontrado.</h2>
                 <Button label="Voltar para Biblioteca" link @click="router.push('/library')" />
             </div>
-
+            <div class="mt-16 border-t border-gray-100 dark:border-gray-800 pt-10">
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
+                    <i class="pi pi-comments text-indigo-500"></i>
+                    Opinião dos leitores
+                </h3>
+                <div v-if="book && (!book.community_reviews || book.community_reviews.length === 0)"
+                    class="text-center py-10 bg-gray-50 dark:bg-gray-800/50 rounded-2xl">
+                    <p class="text-gray-500 dark:text-gray-400">
+                        Ninguém resenhou este livro ainda. Seja o primeiro!
+                    </p>
+                </div>
+                <div v-else class="grid gap-6 md:grid-cols-2">
+                    <div v-for="review in book?.community_reviews" :key="review.id"
+                        class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col gap-4 transition-all hover:shadow-md">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="relative">
+                                    <img :src="review.avatar || 'https://ui-avatars.com/api/?name=' + review.name"
+                                        :alt="review.name"
+                                        class="w-10 h-10 rounded-full object-cover border-2 border-indigo-100 dark:border-gray-600">
+                                    <div v-if="review.status === 3"
+                                        class="absolute -bottom-1 -right-1 bg-green-500 text-white text-[0.6rem] w-4 h-4 flex items-center justify-center rounded-full"
+                                        title="Concluído">
+                                        <i class="pi pi-check"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 dark:text-white text-sm">{{ review.name }}</h4>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ review.date }}</span>
+                                </div>
+                            </div>
+                            <Rating v-model="review.rating" readonly :cancel="false"
+                                class="!gap-1 scale-75 origin-right" />
+                        </div>
+                        <div class="relative">
+                            <i
+                                class="pi pi-quote-left absolute -top-1 -left-1 text-gray-200 dark:text-gray-700 text-3xl -z-10"></i>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed pl-4">
+                                {{ review.review }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 </template>
