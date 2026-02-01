@@ -69,8 +69,8 @@ class User extends Authenticatable
     public function bookshelf()
     {
         return $this->belongsToMany(GlobalBook::class, 'book_user')
-                    ->using(BookUser::class) // Já vamos criar esse arquivo abaixo
-                    ->withPivot('status', 'review', 'rating', 'started_at', 'finished_at')
+                    ->using(BookUser::class)
+                    ->withPivot('status', 'review', 'rating', 'started_at', 'finished_at', 'is_public')
                     ->withTimestamps();
     }
 }

@@ -68,17 +68,17 @@ const resetForm = () => {
 const toDatabaseDate = (dateObj) => {
     if (!dateObj) return null;
     if (!(dateObj instanceof Date) || isNaN(dateObj)) return null;
-    
+
     const year = dateObj.getFullYear();
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const day = String(dateObj.getDate()).padStart(2, '0');
-    
+
     return `${year}-${month}-${day}`;
 };
 
 const parseDatabaseDate = (dateString) => {
     if (!dateString) return null;
-    
+
     const cleanDate = String(dateString).substring(0, 10);
     const [year, month, day] = cleanDate.split('-').map(Number);
     if (!year || !month || !day) return null;
@@ -180,89 +180,106 @@ const buttonLabel = computed(() => {
     if (isLoading.value) return 'Salvando...';
     return props.bookToEdit ? 'Atualizar Livro' : 'Adicionar à Estante';
 });
+
+const getCleanCoverUrl = (url) => {
+    if (!url) return null;
+    return url.replace('http://', 'https://').replace('&edge=curl', '');
+};
 </script>
 
 <template>
-    <div class="flex flex-col gap-6 dark:bg-gray-900">
-        <div v-if="!bookToEdit" class="flex flex-col gap-2">
-            <label class="text-sm text-gray-500 dark:text-gray-400">Preenchimento automático via Google:</label>
+    <div class="flex flex-col gap-5 dark:bg-gray-900">
+        <div v-if="!bookToEdit"
+            class="flex flex-col gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
             <AutoComplete v-model="selectedBookSearch" :suggestions="suggestions" @complete="searchBookParams"
-                @item-select="onBookSelect" optionLabel="title" placeholder="Busque o livro..." class="w-full"
-                inputClass="w-full" panelClass="book-search-dropdown">
+                @item-select="onBookSelect" optionLabel="title" placeholder="Digite o nome do livro..." class="w-full"
+                inputClass="w-full !py-2" panelClass="book-search-dropdown">
                 <template #option="slotProps">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-3">
                         <img v-if="slotProps.option.image_url" :src="slotProps.option.image_url"
-                            class="w-8 h-12 object-cover" />
+                            class="w-8 h-12 object-cover rounded shadow-sm" />
                         <div class="flex flex-col">
-                            <span class="font-bold">{{ slotProps.option.title }}</span>
+                            <span class="font-bold text-sm">{{ slotProps.option.title }}</span>
                             <span class="text-xs text-gray-500">{{ slotProps.option.author }}</span>
                         </div>
                     </div>
                 </template>
             </AutoComplete>
-            <div class="border-b border-gray-200 dark:border-gray-700 my-2"></div>
         </div>
-        <div class="flex gap-6 flex-col md:flex-row">
-            <div class="w-full md:w-32 flex-shrink-0 flex flex-col gap-2 items-center">
-                <div v-if="imageUrl" class="relative w-32 aspect-[2/3]">
-                    <img :src="imageUrl" alt="Capa" class="w-full h-full object-cover rounded shadow-md" />
+        <div class="flex flex-col md:flex-row gap-6">
+            <div class="w-full md:w-40 flex-shrink-0 flex flex-col gap-3 items-center">
+                <div
+                    class="relative w-32 md:w-40 aspect-[2/3] shadow-lg rounded overflow-hidden bg-gray-100 dark:bg-gray-800 group border border-gray-200 dark:border-gray-700">
+                    <img v-if="imageUrl" :src="getCleanCoverUrl(imageUrl)" alt="Capa"
+                        class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                    <div v-else
+                        class="w-full h-full flex flex-col items-center justify-center text-gray-400 p-2 text-center">
+                        <i class="pi pi-image text-2xl mb-1"></i>
+                        <span class="text-[10px]">Sem Capa</span>
+                    </div>
                 </div>
-                <div v-else
-                    class="w-32 aspect-[2/3] bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-gray-400 text-xs text-center p-2">
-                    Sem Capa
+                <div class="w-full">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase text-center block mb-1">ISBN /
+                        ID</label>
+                    <InputText v-model="isbn"
+                        class="w-full !text-xs text-center bg-gray-50 dark:bg-gray-800 opacity-80 !py-1" disabled />
                 </div>
             </div>
-            <div class="flex-1 flex flex-col gap-4 w-full">
-                <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Título</label>
+            <div class="flex-1 flex flex-col gap-3">
+                <div>
+                    <label class="font-semibold text-gray-700 dark:text-gray-200 text-sm block mb-1">Título</label>
                     <InputText v-model="title" class="w-full" />
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="flex flex-col gap-2">
-                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Autor</label>
+                    <div>
+                        <label class="font-semibold text-gray-700 dark:text-gray-200 text-sm block mb-1">Autor</label>
                         <InputText v-model="author" class="w-full" />
                     </div>
-                    <div class="flex flex-col gap-2">
-                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">ISBN</label>
-                        <InputText v-model="isbn" class="w-full bg-gray-50 dark:bg-gray-800 dark:text-gray-400" />
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                    <div class="flex flex-col gap-2">
-                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Status de Leitura</label>
+                    <div>
+                        <label class="font-semibold text-gray-700 dark:text-gray-200 text-sm block mb-1">Status</label>
                         <Dropdown v-model="status" :options="statusOptions" optionLabel="label" optionValue="value"
                             placeholder="Selecione..." class="w-full" />
                     </div>
-                    <div class="flex flex-col gap-2">
-                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Sua Avaliação</label>
-                        <div class="h-[42px] flex items-center">
-                            <Rating v-model="rating" :cancel="false" />
+                </div>
+                <div v-if="status === 'read' || status === 'reading'" class="mt-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="font-bold text-gray-600 dark:text-gray-400 text-xs block mb-1">Início</label>
+                            <DatePicker v-model="started_at" dateFormat="dd/mm/yy" showIcon fluid />
+                        </div>
+                        <div v-if="status === 'read'">
+                            <label class="font-bold text-gray-600 dark:text-gray-400 text-xs block mb-1">Término</label>
+                            <DatePicker v-model="finished_at" dateFormat="dd/mm/yy" showIcon fluid />
+                        </div>
+                        <div v-if="status === 'read'">
+                            <label class="font-semibold text-gray-700 dark:text-gray-200 text-sm block mb-1">Sua
+                                Avaliação</label>
+                            <div class="h-10 flex items-center px-2">
+                                <Rating v-model="rating" :cancel="false" class="scale-90 origin-left" />
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                    <div v-if="status === 'read' || status === 'reading'" class="flex flex-col gap-2">
-                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Início da Leitura</label>
-                        <DatePicker v-model="started_at" dateFormat="dd/mm/yy" class="w-full" />
+                <div class="mt-1">
+                    <div class="flex justify-between items-end mb-1">
+                        <label class="font-semibold text-gray-700 dark:text-gray-200 text-sm">Resenha</label>
+                        <span class="text-[10px] text-gray-400">Opcional</span>
                     </div>
-                    <div v-if="status === 'read'" class="flex flex-col gap-2">
-                        <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Término da Leitura</label>
-                        <DatePicker v-model="finished_at" dateFormat="dd/mm/yy" class="w-full" />
+                    <Textarea v-model="review" class="w-full text-sm !bg-white dark:!bg-gray-900" rows="2" autoResize
+                        placeholder="O que você achou do livro?" />
+                    <div
+                        class="flex items-start gap-2 mt-2 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                        <Checkbox v-model="is_public" :binary="true" inputId="public-review" class="mt-0.5" />
+                        <label for="public-review"
+                            class="text-xs text-gray-600 dark:text-gray-300 cursor-pointer select-none leading-tight">
+                            Publicar minha resenha na página do livro
+                            <span class="block text-[10px] text-gray-400 mt-0.5">(Será visível para outros usuários após a conclusão da leitura conclusão da leitura)</span>
+                        </label>
                     </div>
                 </div>
-                <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-gray-600 dark:text-gray-300 text-sm">Resenha/Comentário</label>
-                    <Textarea v-model="review" class="w-full bg-gray-50 dark:bg-gray-800 dark:text-gray-400" rows="2"
-                        cols="30" />
-                </div>
-                <div class="flex items-center gap-2 mt-3">
-                    <Checkbox v-model="is_public" :binary="true" inputId="public-review" />
-                    <label for="public-review" class="text-sm text-gray-600 dark:text-gray-400 cursor-pointer select-none">
-                        Publicar minha resenha na página do livro (apenas após concluir a leitura)
-                    </label>
-                </div>
-                <div class="mt-4 text-center">
-                    <Button :label="buttonLabel" icon="pi pi-check" severity="success" @click="saveBook" />
+                <div class="flex justify-end pt-2 border-gray-100 dark:border-gray-700 mt-2">
+                    <Button :label="buttonLabel" icon="pi pi-check" severity="success" @click="saveBook"
+                        class="w-full md:w-auto min-w-[120px]" />
                 </div>
             </div>
         </div>

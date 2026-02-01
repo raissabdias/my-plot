@@ -198,8 +198,8 @@ const onPageChange = (event) => {
             </div>
         </main>
         <Dialog v-model:visible="isModalVisible" modal :header="selectedBook ? 'Editar Livro' : 'Adicionar Novo Livro'"
-            :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" dismissableMask
-            class="dark:bg-gray-900">
+            :style="{ width: '55rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }" dismissableMask
+            class="dark:bg-gray-900 p-fluid">
             <div class="pt-2">
                 <BookForm :bookToEdit="selectedBook" @created="onBookSaved" @updated="onBookSaved"
                     class="!shadow-none !border-0 !p-0" />

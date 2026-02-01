@@ -18,7 +18,8 @@ class BookUser extends Pivot
         'review',
         'rating',
         'started_at',
-        'finished_at'
+        'finished_at',
+        'is_public',
     ];
 
     protected $casts = [

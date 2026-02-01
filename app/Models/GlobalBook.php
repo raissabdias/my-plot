@@ -35,7 +35,7 @@ class GlobalBook extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'book_user')
-                    ->withPivot('status', 'review', 'rating', 'started_at', 'finished_at')
+                    ->withPivot('status', 'review', 'rating', 'started_at', 'finished_at', 'is_public')
                     ->withTimestamps();
     }
     

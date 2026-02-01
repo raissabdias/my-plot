@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\GlobalBook;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Requests\ShelfStoreRequest;
 use App\Http\Requests\ShelfUpdateRequest;
 
@@ -16,7 +15,7 @@ class ShelfController extends Controller
     public function index(Request $request)
     {
         $query = $request->user()->bookshelf()
-            ->withPivot(['status', 'rating', 'review', 'started_at', 'finished_at'])
+            ->withPivot(['status', 'rating', 'review', 'started_at', 'finished_at', 'is_public'])
             ->orderByPivot('updated_at', 'desc');
 
         # Search
@@ -86,7 +85,7 @@ class ShelfController extends Controller
                 'review' => $data['review'] ?? null,
                 'started_at' => $data['started_reading_at'] ?? null,
                 'finished_at' => $data['finished_reading_at'] ?? null,
-                'is_public' => $data['is_public'] ?? true
+                'is_public' => $data['is_public'] ?? null
             ]
         ]);
 
@@ -108,7 +107,7 @@ class ShelfController extends Controller
             'review' => $data['review'] ?? null,
             'started_at' => $data['started_at'] ?? null,
             'finished_at' => $data['finished_at'] ?? null,
-            'is_public' => $data['is_public'] ?? true,
+            'is_public' => $data['is_public'] ?? null,
         ]);
 
         return response()->json(['message' => 'Leitura atualizada com sucesso!']);
