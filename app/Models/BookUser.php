@@ -4,9 +4,12 @@ namespace App\Models;
 
 use App\Enums\BookStatus;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BookUser extends Pivot
 {
+    use HasFactory;
+    
     public $incrementing = true;
 
     protected $table = 'book_user';
