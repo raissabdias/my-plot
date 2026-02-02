@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ShelfStoreRequest;
 use App\Http\Requests\ShelfUpdateRequest;
 
+use function Illuminate\Log\log;
+
 class ShelfController extends Controller
 {
     /**
@@ -64,6 +66,8 @@ class ShelfController extends Controller
      */
     public function store(ShelfStoreRequest $request)
     {
+        
+        log($request);
         $data = $request->validated();
         $user = $request->user();
 

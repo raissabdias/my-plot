@@ -93,7 +93,8 @@ const addToBookshelf = async () => {
         authors: book.value.authors,
         isbn: book.value.isbn,
         image_url: book.value.image_url,
-        page_count: book.value.page_count
+        page_count: book.value.page_count,
+        is_public: true,
     };
 
     try {
